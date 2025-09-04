@@ -16,6 +16,17 @@ use Magpie\Http\Client;
 class WebhooksResource extends BaseResource
 {
     /**
+     * Default configuration for webhook signature verification.
+     */
+    private const DEFAULT_CONFIG = [
+        'algorithm' => 'sha256',
+        'signatureHeader' => 'x-magpie-signature',
+        'timestampHeader' => 'x-magpie-timestamp',
+        'tolerance' => 300, // 5 minutes
+        'prefix' => 'v1=',
+    ];
+
+    /**
      * Create a new WebhooksResource instance.
      *
      * @param Client $client The HTTP client instance for API communication
@@ -26,13 +37,23 @@ class WebhooksResource extends BaseResource
     }
 
     /**
-     * Verify a webhook signature.
+     * Verify a webhook signature using timing-safe comparison.
      *
-     * @param string $payload Raw webhook payload (as received from Magpie)
-     * @param string $signature Signature header value
+     * @param string $payload Raw webhook payload (string)
+     * @param string $signature Signature from webhook headers
      * @param string $secret Your webhook endpoint secret
      * @param array $config Optional configuration for signature verification
      * @return bool True if the signature is valid
+     * 
+     * @example
+     * ```php
+     * $isValid = $magpie->webhooks->verifySignature(
+     *     $payload,
+     *     $request->header('x-magpie-signature'),
+     *     'whsec_...',
+     *     ['tolerance' => 600]
+     * );
+     * ```
      */
     public function verifySignature(
         string $payload,
@@ -40,47 +61,16 @@ class WebhooksResource extends BaseResource
         string $secret,
         array $config = []
     ): bool {
-        $tolerance = $config['tolerance'] ?? 300; // 5 minutes default
+        $finalConfig = array_merge(self::DEFAULT_CONFIG, $config);
         
-        // Extract timestamp and signature from header
-        $elements = explode(',', $signature);
-        $timestamp = null;
-        $signatures = [];
-        
-        foreach ($elements as $element) {
-            $parts = explode('=', $element, 2);
-            if (count($parts) !== 2) {
-                continue;
-            }
+        try {
+            $parsedSignature = $this->parseSignature($signature, $finalConfig['prefix']);
+            $expectedSignature = $this->generateSignature($payload, $secret, $finalConfig['algorithm']);
             
-            [$prefix, $value] = $parts;
-            if ($prefix === 't') {
-                $timestamp = (int) $value;
-            } elseif ($prefix === 'v1') {
-                $signatures[] = $value;
-            }
-        }
-        
-        if ($timestamp === null || empty($signatures)) {
+            return $this->timingSafeEqual($parsedSignature['signature'], $expectedSignature);
+        } catch (\Exception $e) {
             return false;
         }
-        
-        // Check timestamp tolerance
-        $currentTime = time();
-        if (abs($currentTime - $timestamp) > $tolerance) {
-            return false;
-        }
-        
-        // Verify signature
-        $expectedSignature = hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
-        
-        foreach ($signatures as $signature) {
-            if (hash_equals($expectedSignature, $signature)) {
-                return true;
-            }
-        }
-        
-        return false;
     }
 
     /**
@@ -162,6 +152,47 @@ class WebhooksResource extends BaseResource
     }
 
     /**
+     * Verify webhook signature with timestamp validation.
+     *
+     * @param string $payload Raw webhook payload
+     * @param array $headers Request headers array
+     * @param string $secret Webhook endpoint secret
+     * @param array $config Optional configuration
+     * @return bool True if both signature and timestamp are valid
+     * @throws MagpieException When signature or timestamp validation fails
+     */
+    public function verifySignatureWithTimestamp(
+        string $payload,
+        array $headers,
+        string $secret,
+        array $config = []
+    ): bool {
+        $finalConfig = array_merge(self::DEFAULT_CONFIG, $config);
+        
+        $signature = $this->getHeader($headers, $finalConfig['signatureHeader']);
+        $timestamp = $this->getHeader($headers, $finalConfig['timestampHeader']);
+        
+        if (!$signature) {
+            throw new MagpieException(
+                "Missing signature header: {$finalConfig['signatureHeader']}",
+                'invalid_request_error',
+                'webhook_signature_missing'
+            );
+        }
+        
+        // Verify timestamp if provided
+        if ($timestamp && !$this->isValidTimestamp((int) $timestamp, $finalConfig['tolerance'])) {
+            throw new MagpieException(
+                'Webhook timestamp is outside tolerance window',
+                'invalid_request_error',
+                'webhook_timestamp_invalid'
+            );
+        }
+        
+        return $this->verifySignature($payload, $signature, $secret, $config);
+    }
+
+    /**
      * Validate if a timestamp is within acceptable tolerance.
      *
      * @param int $timestamp Unix timestamp to validate
@@ -172,5 +203,67 @@ class WebhooksResource extends BaseResource
     {
         $currentTime = time();
         return abs($currentTime - $timestamp) <= $tolerance;
+    }
+
+    /**
+     * Generate HMAC signature for payload.
+     *
+     * @param string $payload
+     * @param string $secret
+     * @param string $algorithm
+     * @return string
+     */
+    private function generateSignature(string $payload, string $secret, string $algorithm): string
+    {
+        return hash_hmac($algorithm, $payload, $secret);
+    }
+
+    /**
+     * Parse signature header value.
+     *
+     * @param string $signature
+     * @param string $prefix
+     * @return array
+     * @throws \Exception
+     */
+    private function parseSignature(string $signature, string $prefix): array
+    {
+        if (!str_starts_with($signature, $prefix)) {
+            throw new \Exception("Invalid signature format. Expected prefix: {$prefix}");
+        }
+        
+        return [
+            'version' => rtrim($prefix, '='),
+            'signature' => substr($signature, strlen($prefix))
+        ];
+    }
+
+    /**
+     * Timing-safe string comparison to prevent timing attacks.
+     *
+     * @param string $a
+     * @param string $b
+     * @return bool
+     */
+    private function timingSafeEqual(string $a, string $b): bool
+    {
+        if (strlen($a) !== strlen($b)) {
+            return false;
+        }
+        
+        return hash_equals($a, $b);
+    }
+
+    /**
+     * Get header value handling both string and array cases.
+     *
+     * @param array $headers
+     * @param string $name
+     * @return string|null
+     */
+    private function getHeader(array $headers, string $name): ?string
+    {
+        $value = $headers[$name] ?? $headers[strtolower($name)] ?? null;
+        return is_array($value) ? $value[0] : $value;
     }
 }
