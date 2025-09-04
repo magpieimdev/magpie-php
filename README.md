@@ -244,22 +244,139 @@ $gcashSource = $magpie->sources->create([
 
 ### Checkout Sessions
 
+Create hosted checkout pages for seamless payment experiences:
+
 ```php
-$session = $magpie->checkout->sessions()->create([
+// Create a checkout session
+$session = $magpie->checkout->sessions->create([
     'line_items' => [
         [
             'name' => 'Premium T-Shirt',
             'amount' => 2500, // ₱25.00
-            'currency' => 'php',
-            'quantity' => 2
+            'quantity' => 2,
+            'description' => 'High-quality cotton t-shirt' // Optional
         ]
     ],
     'success_url' => 'https://example.com/success',
     'cancel_url' => 'https://example.com/cancel',
-    'billing_address_collection' => 'required'
+    'customer_email' => 'customer@example.com',
+    'expires_at' => time() + 3600 // Expire in 1 hour
 ]);
 
-// Redirect user to: $session['checkout_url']
+// Redirect user to checkout page
+header('Location: ' . $session['url']);
+
+// Later, retrieve session to check payment status
+$session = $magpie->checkout->sessions->retrieve('cs_1234567890');
+echo $session['payment_status']; // 'paid', 'unpaid', 'no_payment_required'
+
+// Capture authorized payment (for sessions with capture: false)
+$captured = $magpie->checkout->sessions->capture('cs_1234567890', [
+    'amount' => 2000 // Capture ₱20.00 instead of full ₱25.00
+]);
+
+// Expire a session manually
+$expired = $magpie->checkout->sessions->expire('cs_1234567890');
+```
+
+### Payment Requests
+
+Send payment requests to customers via email or SMS:
+
+```php
+// Create a payment request
+$request = $magpie->paymentRequests->create([
+    'currency' => 'php',
+    'customer' => 'cus_1234567890', // Required: Customer ID
+    'delivery_methods' => ['email', 'sms'], // How to deliver the request
+    'line_items' => [
+        [
+            'name' => 'Monthly Subscription',
+            'amount' => 75000, // ₱750.00
+            'quantity' => 1
+        ]
+    ],
+    'payment_method_types' => ['card', 'gcash', 'paymaya', 'grabpay'],
+    'message' => 'Thank you for your business! Please complete payment within 7 days.',
+    'require_auth' => true, // Require 3D Secure for cards
+    'branding' => [
+        'use_logo' => true,
+        'primary_color' => '#0066cc',
+        'secondary_color' => '#ffffff'
+    ],
+    'metadata' => [
+        'invoice_id' => 'INV-001',
+        'customer_type' => 'premium'
+    ]
+]);
+
+echo "Payment request created: " . $request['payment_request_url'];
+
+// Retrieve payment request status
+$request = $magpie->paymentRequests->retrieve('pr_1234567890');
+echo $request['paid'] ? 'Paid' : 'Pending';
+
+// Resend the payment request
+$resent = $magpie->paymentRequests->resend('pr_1234567890');
+
+// Void/cancel a payment request
+$voided = $magpie->paymentRequests->void('pr_1234567890', [
+    'reason' => 'duplicate_request'
+]);
+```
+
+### Payment Links
+
+Create shareable payment links for social media, email campaigns, or instant invoicing:
+
+```php
+// Create a payment link
+$link = $magpie->paymentLinks->create([
+    'internal_name' => 'Website Design Service',
+    'allow_adjustable_quantity' => true,
+    'line_items' => [
+        [
+            'name' => 'Website Design Package',
+            'amount' => 100000, // ₱1,000.00
+            'quantity' => 1,
+            'image' => 'https://example.com/service.jpg',
+            'description' => 'Complete website design with 3 revisions'
+        ]
+    ],
+    'metadata' => [
+        'service_type' => 'web_design',
+        'package' => 'premium'
+    ]
+]);
+
+echo "Share this link: " . $link['url']; // https://buy.magpie.im/pl_1234567890
+
+// Retrieve payment link details
+$link = $magpie->paymentLinks->retrieve('pl_1234567890');
+echo "Active: " . ($link['active'] ? 'Yes' : 'No');
+
+// Update payment link
+$updated = $magpie->paymentLinks->update('pl_1234567890', [
+    'internal_name' => 'Updated Service Name',
+    'metadata' => ['campaign' => 'holiday-sale']
+]);
+
+// Activate/deactivate payment links
+$activated = $magpie->paymentLinks->activate('pl_1234567890');
+$deactivated = $magpie->paymentLinks->deactivate('pl_1234567890');
+```
+
+### Customer Management Extended
+
+```php
+// Retrieve customer by email
+$customer = $magpie->customers->retrieveByEmail('john@example.com');
+
+// Attach payment source to customer
+$updatedCustomer = $magpie->customers->attachSource('cus_123', 'src_456');
+
+// Detach payment source from customer
+$updatedCustomer = $magpie->customers->detachSource('cus_123', 'src_456');
 ```
 
 ## Configuration

@@ -134,7 +134,7 @@ class Client
     private function createRetryMiddleware(): callable
     {
         return Middleware::retry(
-            function ($retries, RequestInterface $request, ResponseInterface $response = null, RequestException $exception = null) {
+            function ($retries, RequestInterface $request, ?ResponseInterface $response = null, ?RequestException $exception = null) {
                 // Don't retry if we've hit the max retries
                 if ($retries >= $this->config->maxRetries) {
                     return false;

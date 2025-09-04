@@ -60,7 +60,7 @@ class MagpieTest extends TestCase
     public function testThrowsExceptionForInvalidSecretKey(): void
     {
         $this->expectException(ConfigurationException::class);
-        $this->expectExceptionMessage('Invalid secret key format');
+        $this->expectExceptionMessage('Invalid secret key format. Secret key must start with "sk_"');
         
         new Magpie('invalid_key_format');
     }

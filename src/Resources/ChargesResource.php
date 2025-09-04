@@ -72,29 +72,6 @@ class ChargesResource extends BaseResource
     }
 
     /**
-     * List charges with optional filtering and pagination.
-     *
-     * @param array $params List parameters (filters, pagination, etc.)
-     * @param array $options Additional request options
-     * @return array List of charges with pagination information
-     * @throws MagpieException
-     *
-     * @example
-     * ```php
-     * $charges = $magpie->charges->list([
-     *     'limit' => 10,
-     *     'created_at' => ['gte' => '2024-01-01'],
-     *     'status' => 'succeeded'
-     * ]);
-     * ```
-     */
-    public function list(array $params = [], array $options = []): array
-    {
-        $queryParams = $this->buildListParams($params);
-        return parent::list($queryParams, $options);
-    }
-
-    /**
      * Capture a previously authorized charge.
      *
      * When you create a charge with `capture: false`, it will be authorized but not

@@ -25,7 +25,7 @@ class MagpieException extends Exception
     /**
      * The error code as returned by the API.
      */
-    public ?string $code = null;
+    public ?string $errorCode = null;
 
     /**
      * The HTTP status code of the response that caused this exception.
@@ -79,7 +79,7 @@ class MagpieException extends Exception
         parent::__construct($message, 0, $previous);
         
         $this->type = $type;
-        $this->code = $code;
+        $this->errorCode = $code;
         $this->statusCode = $statusCode;
         $this->requestId = $requestId;
         $this->details = $details;
@@ -177,7 +177,7 @@ class MagpieException extends Exception
         return [
             'message' => $this->getMessage(),
             'type' => $this->type,
-            'code' => $this->code,
+            'code' => $this->errorCode,
             'status_code' => $this->statusCode,
             'request_id' => $this->requestId,
             'details' => $this->details,
