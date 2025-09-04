@@ -186,6 +186,7 @@ class ChargesResource extends BaseResource
      * ```php
      * // Full refund
      * $refunded = $magpie->charges->refund('ch_1234567890', [
+     *     'amount' => 20000,
      *     'reason' => 'requested_by_customer'
      * ]);
      *

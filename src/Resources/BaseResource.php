@@ -28,15 +28,22 @@ abstract class BaseResource
     protected string $basePath;
 
     /**
+     * Custom base URL for this resource (if different from default).
+     */
+    protected ?string $customBaseUrl;
+
+    /**
      * Create a new resource instance.
      *
      * @param Client $client HTTP client instance
      * @param string $basePath Base API path for this resource
+     * @param string|null $customBaseUrl Custom base URL for this resource
      */
-    public function __construct(Client $client, string $basePath)
+    public function __construct(Client $client, string $basePath, ?string $customBaseUrl = null)
     {
         $this->client = $client;
         $this->basePath = ltrim($basePath, '/');
+        $this->customBaseUrl = $customBaseUrl;
     }
 
     /**

@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
+use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
 
 /**
- * Resource class for managing payment sources (cards, bank accounts, etc.).
+ * Resource class for managing payment sources.
+ *
+ * The SourcesResource provides methods to create and retrieve payment sources
+ * such as credit cards, debit cards, and bank accounts. Sources represent
+ * payment methods that can be attached to customers or used for one-time payments.
  */
 class SourcesResource extends BaseResource
 {
@@ -16,117 +21,51 @@ class SourcesResource extends BaseResource
         parent::__construct($client, '/sources');
     }
 
+    /**
+     * Create a new payment source.
+     *
+     * Payment sources represent payment methods like credit cards or bank accounts
+     * that can be used to process payments. Sources can be reusable or single-use.
+     *
+     * @param array $params The parameters for creating the source
+     * @param array $options Additional request options
+     * @return array Created source data
+     * @throws MagpieException
+     * 
+     * @example
+     * ```php
+     * // Create a card source
+     * $cardSource = $magpie->sources->create([
+     *     'type' => 'card',
+     *     'card' => [
+     *         'name' => 'John Doe',
+     *         'number' => '4242424242424242',
+     *         'exp_month' => '12',
+     *         'exp_year' => '2025',
+     *         'cvc' => '123'
+     *     ],
+     *     'redirect' => [
+     *         'success' => 'https://example.com/success',
+     *         'fail' => 'https://example.com/fail'
+     *     ]
+     * ]);
+     * ```
+     */
     public function create(array $params, array $options = []): array
     {
         return parent::create($params, $options);
-    }
-
-    public function retrieve(string $id, array $options = []): array
-    {
-        return parent::retrieve($id, $options);
-    }
-}
-
-/**
- * Resource class for managing checkout sessions.
- */
-class CheckoutResource extends BaseResource
-{
-    public function __construct(Client $client)
-    {
-        parent::__construct($client, '/checkout');
-    }
-
-    public function sessions(): CheckoutSessionsResource
-    {
-        return new CheckoutSessionsResource($this->client);
-    }
-}
-
-/**
- * Resource class for checkout sessions.
- */
-class CheckoutSessionsResource extends BaseResource
-{
-    public function __construct(Client $client)
-    {
-        parent::__construct($client, '/checkout/sessions');
-    }
-
-    public function create(array $params, array $options = []): array
-    {
-        return parent::create($params, $options);
-    }
-
-    public function retrieve(string $id, array $options = []): array
-    {
-        return parent::retrieve($id, $options);
-    }
-}
-
-/**
- * Resource class for managing payment requests.
- */
-class PaymentRequestsResource extends BaseResource
-{
-    public function __construct(Client $client)
-    {
-        parent::__construct($client, '/payment-requests');
-    }
-
-    public function create(array $params, array $options = []): array
-    {
-        return parent::create($params, $options);
-    }
-
-    public function retrieve(string $id, array $options = []): array
-    {
-        return parent::retrieve($id, $options);
-    }
-}
-
-/**
- * Resource class for managing payment links.
- */
-class PaymentLinksResource extends BaseResource
-{
-    public function __construct(Client $client)
-    {
-        parent::__construct($client, '/payment-links');
-    }
-
-    public function create(array $params, array $options = []): array
-    {
-        return parent::create($params, $options);
-    }
-
-    public function retrieve(string $id, array $options = []): array
-    {
-        return parent::retrieve($id, $options);
-    }
-}
-
-/**
- * Resource class for managing webhooks.
- */
-class WebhooksResource extends BaseResource
-{
-    public function __construct(Client $client)
-    {
-        parent::__construct($client, '/webhooks');
     }
 
     /**
-     * Construct a webhook event from the request body and signature.
+     * Retrieve an existing payment source by ID.
      *
-     * @param string $payload The request body
-     * @param string $signature The webhook signature
-     * @param string $secret The webhook secret
-     * @return array The verified webhook event
+     * @param string $id The unique identifier of the source
+     * @param array $options Additional request options
+     * @return array Source data
+     * @throws MagpieException
      */
-    public function constructEvent(string $payload, string $signature, string $secret): array
+    public function retrieve(string $id, array $options = []): array
     {
-        // TODO: Implement webhook signature verification
-        return json_decode($payload, true);
+        return parent::retrieve($id, $options);
     }
 }
