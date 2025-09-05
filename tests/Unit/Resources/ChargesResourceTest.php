@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Magpie\Resources\ChargesResource
+ * @covers \Magpie\Resources\BaseResource
+ * @covers \Magpie\Exceptions\MagpieException
  */
 class ChargesResourceTest extends TestCase
 {

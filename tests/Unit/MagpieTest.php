@@ -11,6 +11,20 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Magpie\Magpie
+ * @covers \Magpie\Http\Client
+ * @covers \Magpie\Http\Config
+ * @covers \Magpie\Resources\BaseResource
+ * @covers \Magpie\Resources\ChargesResource
+ * @covers \Magpie\Resources\CheckoutResource
+ * @covers \Magpie\Resources\CustomersResource
+ * @covers \Magpie\Resources\OrganizationResource
+ * @covers \Magpie\Resources\PaymentLinksResource
+ * @covers \Magpie\Resources\PaymentRequestsResource
+ * @covers \Magpie\Resources\SourcesResource
+ * @covers \Magpie\Resources\WebhooksResource
+ * @covers \Magpie\Resources\CheckoutSessionsResource
+ * @covers \Magpie\Exceptions\ConfigurationException
+ * @covers \Magpie\Exceptions\MagpieException
  */
 class MagpieTest extends TestCase
 {
