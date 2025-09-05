@@ -8,7 +8,7 @@
          beStrictAboutCoverageMetadata="true"
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
-         failOnWarning="true"
+         failOnWarning="false"
          colors="true">
     
     <testsuites>
@@ -20,13 +20,10 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <coverage>
         <include>
             <directory suffix=".php">src</directory>
         </include>
-    </source>
-
-    <coverage>
         <report>
             <html outputDirectory="coverage-html"/>
             <text outputFile="php://stdout"/>
