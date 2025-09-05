@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static \Magpie\Resources\ChargesResource         charges()
  * @method static \Magpie\Resources\CustomersResource       customers()
+ * @method static \Magpie\Resources\OrganizationResource    organization()
  * @method static \Magpie\Resources\SourcesResource         sources()
  * @method static \Magpie\Resources\CheckoutResource        checkout()
  * @method static \Magpie\Resources\PaymentRequestsResource paymentRequests()

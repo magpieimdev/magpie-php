@@ -27,6 +27,9 @@ class SourcesResourceTest extends TestCase
         $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
 
+        // Mock the PK authentication flow during retrieve call
+        $this->mockPKAuthenticationFlow($client);
+
         $sourceId = 'src_test_123';
         $expectedResponse = [
             'id' => $sourceId,
@@ -61,10 +64,44 @@ class SourcesResourceTest extends TestCase
         $this->assertArrayNotHasKey('cvc', $result['card']);
     }
 
+    /**
+     * Mock the PK authentication flow that happens in SourcesResource constructor.
+     */
+    private function mockPKAuthenticationFlow($client): void
+    {
+        // Mock the initial getApiKey() call to check if it's a secret key
+        $client->shouldReceive('getApiKey')
+            ->once()
+            ->andReturn('sk_test_secret123');
+
+        // Mock the organization /me endpoint call
+        $organizationData = [
+            'pk_test_key' => 'pk_test_public123',
+            'pk_live_key' => 'pk_live_public456',
+        ];
+
+        $client->shouldReceive('get')
+            ->once()
+            ->with('me', null, [])
+            ->andReturn($organizationData);
+
+        // Mock the setApiKey() call to switch to public key
+        $client->shouldReceive('setApiKey')
+            ->once()
+            ->with('pk_test_public123');
+
+        // Mock the final getApiKey() call in ensurePublicKeyAuthentication
+        $client->shouldReceive('getApiKey')
+            ->andReturn('pk_test_public123');
+    }
+
     public function testRetrieveWithOptions(): void
     {
         $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
+
+        // Mock the PK authentication flow during retrieve call
+        $this->mockPKAuthenticationFlow($client);
 
         $sourceId = 'src_test_123';
         $options = ['expand' => ['charges']];
@@ -98,6 +135,9 @@ class SourcesResourceTest extends TestCase
         $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
 
+        // Mock the PK authentication flow during retrieve call
+        $this->mockPKAuthenticationFlow($client);
+
         $sourceId = 'src_nonexistent_999';
 
         $client->shouldReceive('get')
@@ -115,6 +155,9 @@ class SourcesResourceTest extends TestCase
     {
         $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
+
+        // Mock the PK authentication flow during retrieve call
+        $this->mockPKAuthenticationFlow($client);
 
         $sourceId = 'src_gcash_456';
         $expectedResponse = [

@@ -9,6 +9,7 @@ use Magpie\Http\Config;
 use Magpie\Resources\ChargesResource;
 use Magpie\Resources\CheckoutResource;
 use Magpie\Resources\CustomersResource;
+use Magpie\Resources\OrganizationResource;
 use Magpie\Resources\PaymentLinksResource;
 use Magpie\Resources\PaymentRequestsResource;
 use Magpie\Resources\SourcesResource;
@@ -59,6 +60,11 @@ class Magpie
      * API resource for managing customers.
      */
     public readonly CustomersResource $customers;
+
+    /**
+     * API resource for managing organization settings and information.
+     */
+    public readonly OrganizationResource $organization;
 
     /**
      * API resource for managing payment sources (cards, bank accounts, etc.).
@@ -125,6 +131,7 @@ class Magpie
         // Initialize all resource classes
         $this->charges = new ChargesResource($this->client);
         $this->customers = new CustomersResource($this->client);
+        $this->organization = new OrganizationResource($this->client);
         $this->sources = new SourcesResource($this->client);
         $this->checkout = new CheckoutResource($this->client);
         $this->paymentRequests = new PaymentRequestsResource($this->client);

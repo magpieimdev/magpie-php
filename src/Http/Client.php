@@ -15,6 +15,7 @@ use Magpie\Exceptions\AuthenticationException;
 use Magpie\Exceptions\ConfigurationException;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Exceptions\NetworkException;
+// Import additional exceptions from ValidationException.php
 use Magpie\Exceptions\NotFoundException;
 use Magpie\Exceptions\PermissionException;
 use Magpie\Exceptions\RateLimitException;
@@ -371,6 +372,51 @@ class Client
     public function getConfig(): Config
     {
         return $this->config;
+    }
+
+    /**
+     * Validate API key format (supports both secret and public keys).
+     *
+     * @throws ConfigurationException
+     */
+    private function validateApiKey(string $apiKey): void
+    {
+        if (empty($apiKey)) {
+            throw new ConfigurationException('API key is required');
+        }
+
+        if (! str_starts_with($apiKey, 'sk_') && ! str_starts_with($apiKey, 'pk_')) {
+            throw new ConfigurationException('Invalid API key format. API key must start with "sk_" or "pk_"');
+        }
+    }
+
+    /**
+     * Update the API key used for authentication.
+     *
+     * This method allows changing the API key after client instantiation.
+     * Useful for switching between secret and public keys or updating credentials.
+     *
+     * @param string $apiKey The new API key (secret or public key)
+     *
+     * @throws ConfigurationException
+     */
+    public function setApiKey(string $apiKey): void
+    {
+        $this->validateApiKey($apiKey);
+        $this->secretKey = $apiKey;
+
+        // Recreate the HTTP client with the new API key
+        $this->httpClient = $this->createHttpClient();
+    }
+
+    /**
+     * Get the current API key.
+     *
+     * @return string The current API key
+     */
+    public function getApiKey(): string
+    {
+        return $this->secretKey;
     }
 
     /**
