@@ -21,8 +21,8 @@ class ValidationException extends MagpieException
      * Create a new ValidationException.
      *
      * @param string $message The error message
-     * @param array $errors Field validation errors
-     * @param mixed ...$args Additional constructor arguments
+     * @param array  $errors  Field validation errors
+     * @param mixed  ...$args Additional constructor arguments
      */
     public function __construct(string $message = 'Validation failed', array $errors = [], ...$args)
     {
@@ -32,9 +32,6 @@ class ValidationException extends MagpieException
 
     /**
      * Get validation errors for a specific field.
-     *
-     * @param string $field
-     * @return array
      */
     public function getFieldErrors(string $field): array
     {
@@ -43,13 +40,10 @@ class ValidationException extends MagpieException
 
     /**
      * Check if a field has validation errors.
-     *
-     * @param string $field
-     * @return bool
      */
     public function hasFieldErrors(string $field): bool
     {
-        return !empty($this->errors[$field]);
+        return ! empty($this->errors[$field]);
     }
 }
 
@@ -58,9 +52,12 @@ class ValidationException extends MagpieException
  */
 class RateLimitException extends MagpieException
 {
-    public function __construct(string $message = 'Rate limit exceeded', ...$args)
+    /**
+     * Create a new RateLimitException.
+     */
+    public function __construct(string $message = 'Rate limit exceeded', ?string $code = null, ?int $statusCode = null, ?string $requestId = null, array $details = [], ?\Psr\Http\Message\ResponseInterface $response = null, array $headers = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, 'rate_limit_error', ...$args);
+        parent::__construct($message, 'rate_limit_error', $code, $statusCode, $requestId, $details, $response, $headers, $previous);
     }
 }
 
@@ -69,9 +66,12 @@ class RateLimitException extends MagpieException
  */
 class NetworkException extends MagpieException
 {
-    public function __construct(string $message = 'Network error', ...$args)
+    /**
+     * Create a new NetworkException.
+     */
+    public function __construct(string $message = 'Network error', ?string $code = null, ?int $statusCode = null, ?string $requestId = null, array $details = [], ?\Psr\Http\Message\ResponseInterface $response = null, array $headers = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, 'network_error', ...$args);
+        parent::__construct($message, 'network_error', $code, $statusCode, $requestId, $details, $response, $headers, $previous);
     }
 }
 
@@ -80,9 +80,12 @@ class NetworkException extends MagpieException
  */
 class NotFoundException extends MagpieException
 {
-    public function __construct(string $message = 'Resource not found', ...$args)
+    /**
+     * Create a new NotFoundException.
+     */
+    public function __construct(string $message = 'Resource not found', ?string $code = null, ?int $statusCode = null, ?string $requestId = null, array $details = [], ?\Psr\Http\Message\ResponseInterface $response = null, array $headers = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, 'not_found_error', ...$args);
+        parent::__construct($message, 'not_found_error', $code, $statusCode, $requestId, $details, $response, $headers, $previous);
     }
 }
 
@@ -91,9 +94,12 @@ class NotFoundException extends MagpieException
  */
 class PermissionException extends MagpieException
 {
-    public function __construct(string $message = 'Permission denied', ...$args)
+    /**
+     * Create a new PermissionException.
+     */
+    public function __construct(string $message = 'Permission denied', ?string $code = null, ?int $statusCode = null, ?string $requestId = null, array $details = [], ?\Psr\Http\Message\ResponseInterface $response = null, array $headers = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, 'permission_error', ...$args);
+        parent::__construct($message, 'permission_error', $code, $statusCode, $requestId, $details, $response, $headers, $previous);
     }
 }
 
@@ -102,8 +108,11 @@ class PermissionException extends MagpieException
  */
 class ConfigurationException extends MagpieException
 {
-    public function __construct(string $message = 'Configuration error', ...$args)
+    /**
+     * Create a new ConfigurationException.
+     */
+    public function __construct(string $message = 'Configuration error', ?string $code = null, ?int $statusCode = null, ?string $requestId = null, array $details = [], ?\Psr\Http\Message\ResponseInterface $response = null, array $headers = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, 'configuration_error', ...$args);
+        parent::__construct($message, 'configuration_error', $code, $statusCode, $requestId, $details, $response, $headers, $previous);
     }
 }

@@ -6,7 +6,6 @@ namespace Magpie\Exceptions;
 
 use Exception;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
 
 /**
  * Base exception class for all Magpie API errors.
@@ -15,7 +14,7 @@ use Throwable;
  * including HTTP errors, API errors, and client-side errors. It includes rich
  * error information for debugging and handling different error scenarios.
  */
-class MagpieException extends Exception
+class MagpieException extends \Exception
 {
     /**
      * The error type as returned by the API.
@@ -55,15 +54,15 @@ class MagpieException extends Exception
     /**
      * Create a new MagpieException instance.
      *
-     * @param string $message The error message
-     * @param string|null $type The error type from the API
-     * @param string|null $code The error code from the API
-     * @param int|null $statusCode HTTP status code
-     * @param string|null $requestId The request ID for debugging
-     * @param array $details Additional error details
-     * @param ResponseInterface|null $response The raw HTTP response
-     * @param array $headers Response headers
-     * @param Throwable|null $previous Previous exception for chaining
+     * @param string                 $message    The error message
+     * @param string|null            $type       The error type from the API
+     * @param string|null            $code       The error code from the API
+     * @param int|null               $statusCode HTTP status code
+     * @param string|null            $requestId  The request ID for debugging
+     * @param array                  $details    Additional error details
+     * @param ResponseInterface|null $response   The raw HTTP response
+     * @param array                  $headers    Response headers
+     * @param \Throwable|null        $previous   Previous exception for chaining
      */
     public function __construct(
         string $message = '',
@@ -74,10 +73,10 @@ class MagpieException extends Exception
         array $details = [],
         ?ResponseInterface $response = null,
         array $headers = [],
-        ?Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, 0, $previous);
-        
+
         $this->type = $type;
         $this->errorCode = $code;
         $this->statusCode = $statusCode;
@@ -91,34 +90,33 @@ class MagpieException extends Exception
      * Create a MagpieException from an HTTP response.
      *
      * @param ResponseInterface $response The HTTP response
-     * @return static
      */
-    public static function fromResponse(ResponseInterface $response): static
+    public static function fromResponse(ResponseInterface $response): self
     {
         $statusCode = $response->getStatusCode();
         $body = $response->getBody()->getContents();
         $headers = [];
-        
+
         // Convert headers to array
         foreach ($response->getHeaders() as $name => $values) {
             $headers[$name] = implode(', ', $values);
         }
-        
+
         $requestId = $headers['request-id'] ?? $headers['Request-ID'] ?? null;
-        
+
         try {
             $data = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             $data = ['error' => ['message' => 'Invalid JSON response']];
         }
-        
+
         $error = $data['error'] ?? $data;
         $message = $error['message'] ?? $data['message'] ?? "HTTP {$statusCode} Error";
         $type = $error['type'] ?? static::mapStatusToErrorType($statusCode);
         $code = $error['code'] ?? "http_{$statusCode}";
         $details = $error['details'] ?? [];
-        
-        return new static(
+
+        return new self(
             $message,
             $type,
             $code,
@@ -132,18 +130,15 @@ class MagpieException extends Exception
 
     /**
      * Map HTTP status codes to error types.
-     *
-     * @param int $statusCode
-     * @return string
      */
     protected static function mapStatusToErrorType(int $statusCode): string
     {
         return match (true) {
             $statusCode >= 500 => 'api_error',
-            $statusCode === 429 => 'rate_limit_error',
-            $statusCode === 401 => 'authentication_error',
-            $statusCode === 403 => 'permission_error',
-            $statusCode === 404 => 'not_found_error',
+            429 === $statusCode => 'rate_limit_error',
+            401 === $statusCode => 'authentication_error',
+            403 === $statusCode => 'permission_error',
+            404 === $statusCode => 'not_found_error',
             $statusCode >= 400 => 'invalid_request_error',
             default => 'api_error'
         };
@@ -151,8 +146,6 @@ class MagpieException extends Exception
 
     /**
      * Get a user-friendly description of the error.
-     *
-     * @return string
      */
     public function getUserMessage(): string
     {
@@ -169,8 +162,6 @@ class MagpieException extends Exception
 
     /**
      * Get all error information as an array.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -187,19 +178,19 @@ class MagpieException extends Exception
 
     /**
      * Convert the exception to a JSON string.
-     *
-     * @return string
      */
     public function toJson(): string
     {
-        return json_encode($this->toArray(), JSON_PRETTY_PRINT);
+        $json = json_encode($this->toArray(), JSON_PRETTY_PRINT);
+        if (false === $json) {
+            throw new \RuntimeException('Failed to encode exception to JSON');
+        }
+
+        return $json;
     }
 
     /**
      * Check if this is a specific type of error.
-     *
-     * @param string $type
-     * @return bool
      */
     public function isType(string $type): bool
     {
@@ -208,8 +199,6 @@ class MagpieException extends Exception
 
     /**
      * Check if this error is retryable.
-     *
-     * @return bool
      */
     public function isRetryable(): bool
     {

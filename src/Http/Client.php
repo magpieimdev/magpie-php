@@ -56,9 +56,9 @@ class Client
     /**
      * Create a new HTTP client instance.
      *
-     * @param string $secretKey The Magpie secret API key
-     * @param Config|array|null $config Client configuration
-     * @param LoggerInterface|null $logger Logger for debug information
+     * @param string               $secretKey The Magpie secret API key
+     * @param Config|array|null    $config    Client configuration
+     * @param LoggerInterface|null $logger    Logger for debug information
      *
      * @throws ConfigurationException
      */
@@ -68,7 +68,7 @@ class Client
         ?LoggerInterface $logger = null
     ) {
         $this->validateSecretKey($secretKey);
-        
+
         $this->secretKey = $secretKey;
         $this->config = $config instanceof Config ? $config : new Config($config ?? []);
         $this->logger = $logger ?? new NullLogger();
@@ -79,7 +79,6 @@ class Client
     /**
      * Validate the secret key format.
      *
-     * @param string $secretKey
      * @throws ConfigurationException
      */
     private function validateSecretKey(string $secretKey): void
@@ -88,23 +87,21 @@ class Client
             throw new ConfigurationException('Secret key is required');
         }
 
-        if (!str_starts_with($secretKey, 'sk_')) {
+        if (! str_starts_with($secretKey, 'sk_')) {
             throw new ConfigurationException('Invalid secret key format. Secret key must start with "sk_"');
         }
     }
 
     /**
      * Create the underlying Guzzle HTTP client.
-     *
-     * @return GuzzleClient
      */
     private function createHttpClient(): GuzzleClient
     {
         $stack = HandlerStack::create();
-        
+
         // Add retry middleware
         $stack->push($this->createRetryMiddleware());
-        
+
         // Add request/response logging middleware
         if ($this->config->debug) {
             $stack->push($this->createLoggingMiddleware());
@@ -128,37 +125,35 @@ class Client
 
     /**
      * Create retry middleware for handling transient failures.
-     *
-     * @return callable
      */
     private function createRetryMiddleware(): callable
     {
         return Middleware::retry(
-            function ($retries, RequestInterface $request, ?ResponseInterface $response = null, ?RequestException $exception = null) {
+            function ($retries, RequestInterface $request, ?ResponseInterface $response = null, $exception = null) {
                 // Don't retry if we've hit the max retries
                 if ($retries >= $this->config->maxRetries) {
                     return false;
                 }
 
-                // Retry on network errors
-                if ($exception instanceof ConnectException) {
+                // Retry on connection errors
+                if (null !== $exception && $exception instanceof ConnectException) {
                     return true;
                 }
 
                 // Don't retry if we don't have a response
-                if ($response === null) {
+                if (null === $response) {
                     return false;
                 }
 
                 $statusCode = $response->getStatusCode();
-                
+
                 // Retry on server errors and rate limiting
-                if ($statusCode >= 500 || $statusCode === 429) {
+                if ($statusCode >= 500 || 429 === $statusCode) {
                     return true;
                 }
 
                 // Don't retry POST requests without idempotency key
-                if ($request->getMethod() === 'POST' && !$request->hasHeader('X-Idempotency-Key')) {
+                if ('POST' === $request->getMethod() && ! $request->hasHeader('X-Idempotency-Key')) {
                     return false;
                 }
 
@@ -173,7 +168,6 @@ class Client
     /**
      * Calculate retry delay with exponential backoff and jitter.
      *
-     * @param int $retries
      * @return int Delay in milliseconds
      */
     private function calculateRetryDelay(int $retries): int
@@ -181,14 +175,12 @@ class Client
         $baseDelay = $this->config->retryDelay;
         $exponentialDelay = $baseDelay * (2 ** ($retries - 1));
         $jitter = rand(0, (int) ($exponentialDelay * 0.1));
-        
+
         return min($exponentialDelay + $jitter, $this->config->maxRetryDelay * 1000);
     }
 
     /**
      * Create logging middleware for debug output.
-     *
-     * @return callable
      */
     private function createLoggingMiddleware(): callable
     {
@@ -210,14 +202,11 @@ class Client
 
     /**
      * Sanitize headers for logging (remove sensitive information).
-     *
-     * @param array $headers
-     * @return array
      */
     private function sanitizeHeaders(array $headers): array
     {
         $sanitized = [];
-        
+
         foreach ($headers as $name => $values) {
             if (in_array(strtolower($name), ['authorization', 'x-api-key'])) {
                 $sanitized[$name] = ['[REDACTED]'];
@@ -225,17 +214,18 @@ class Client
                 $sanitized[$name] = $values;
             }
         }
-        
+
         return $sanitized;
     }
 
     /**
      * Make an HTTP request to the Magpie API.
      *
-     * @param string $method HTTP method (GET, POST, PUT, PATCH, DELETE)
-     * @param string $path API endpoint path
-     * @param array|null $data Request data (body for POST/PUT/PATCH, query params for GET)
-     * @param array $options Additional request options
+     * @param string     $method  HTTP method (GET, POST, PUT, PATCH, DELETE)
+     * @param string     $path    API endpoint path
+     * @param array|null $data    Request data (body for POST/PUT/PATCH, query params for GET)
+     * @param array      $options Additional request options
+     *
      * @return array Decoded response data
      *
      * @throws MagpieException
@@ -243,14 +233,14 @@ class Client
     public function request(string $method, string $path, ?array $data = null, array $options = []): array
     {
         $path = ltrim($path, '/');
-        
+
         try {
             $requestOptions = [];
 
             // Handle request data
-            if (in_array(strtoupper($method), ['POST', 'PUT', 'PATCH']) && $data !== null) {
+            if (in_array(strtoupper($method), ['POST', 'PUT', 'PATCH']) && null !== $data) {
                 $requestOptions['json'] = $data;
-            } elseif ($data !== null) {
+            } elseif (null !== $data) {
                 $requestOptions['query'] = $data;
             }
 
@@ -262,14 +252,13 @@ class Client
             // Add expand parameters if provided
             if (isset($options['expand']) && is_array($options['expand'])) {
                 $requestOptions['query'] = array_merge($requestOptions['query'] ?? [], [
-                    'expand' => $options['expand']
+                    'expand' => $options['expand'],
                 ]);
             }
 
             $response = $this->httpClient->request($method, $path, $requestOptions);
-            
-            return $this->handleResponse($response);
 
+            return $this->handleResponse($response);
         } catch (RequestException $e) {
             throw $this->createExceptionFromRequestException($e);
         }
@@ -278,64 +267,48 @@ class Client
     /**
      * Handle successful HTTP response.
      *
-     * @param ResponseInterface $response
-     * @return array
      * @throws MagpieException
      */
     private function handleResponse(ResponseInterface $response): array
     {
         $body = (string) $response->getBody();
-        
+
         try {
             return json_decode($body, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new MagpieException(
-                'Invalid JSON response from API',
-                'api_error',
-                'invalid_json',
-                $response->getStatusCode(),
-                $this->getRequestId($response),
-                [],
-                $response
-            );
+            throw new MagpieException('Invalid JSON response from API', 'api_error', 'invalid_json', $response->getStatusCode(), $this->getRequestId($response), [], $response);
         }
     }
 
     /**
      * Create appropriate exception from Guzzle RequestException.
-     *
-     * @param RequestException $e
-     * @return MagpieException
      */
     private function createExceptionFromRequestException(RequestException $e): MagpieException
     {
         $response = $e->getResponse();
-        
-        if ($response === null) {
-            return new NetworkException($e->getMessage(), previous: $e);
+
+        if (null === $response) {
+            return new NetworkException($e->getMessage());
         }
 
         $statusCode = $response->getStatusCode();
-        
+
         // Create appropriate exception based on status code
         $exceptionClass = match (true) {
-            $statusCode === 401 => AuthenticationException::class,
-            $statusCode === 403 => PermissionException::class,
-            $statusCode === 404 => NotFoundException::class,
-            $statusCode === 422 => ValidationException::class,
-            $statusCode === 429 => RateLimitException::class,
+            401 === $statusCode => AuthenticationException::class,
+            403 === $statusCode => PermissionException::class,
+            404 === $statusCode => NotFoundException::class,
+            422 === $statusCode => ValidationException::class,
+            429 === $statusCode => RateLimitException::class,
             $statusCode >= 400 && $statusCode < 500 => ValidationException::class,
             default => MagpieException::class
         };
-        
+
         return $exceptionClass::fromResponse($response);
     }
 
     /**
      * Get request ID from response headers.
-     *
-     * @param ResponseInterface $response
-     * @return string|null
      */
     private function getRequestId(ResponseInterface $response): ?string
     {
@@ -345,10 +318,6 @@ class Client
     /**
      * Make a GET request.
      *
-     * @param string $path
-     * @param array|null $params
-     * @param array $options
-     * @return array
      * @throws MagpieException
      */
     public function get(string $path, ?array $params = null, array $options = []): array
@@ -359,10 +328,6 @@ class Client
     /**
      * Make a POST request.
      *
-     * @param string $path
-     * @param array|null $data
-     * @param array $options
-     * @return array
      * @throws MagpieException
      */
     public function post(string $path, ?array $data = null, array $options = []): array
@@ -373,10 +338,6 @@ class Client
     /**
      * Make a PUT request.
      *
-     * @param string $path
-     * @param array|null $data
-     * @param array $options
-     * @return array
      * @throws MagpieException
      */
     public function put(string $path, ?array $data = null, array $options = []): array
@@ -387,10 +348,6 @@ class Client
     /**
      * Make a PATCH request.
      *
-     * @param string $path
-     * @param array|null $data
-     * @param array $options
-     * @return array
      * @throws MagpieException
      */
     public function patch(string $path, ?array $data = null, array $options = []): array
@@ -401,10 +358,6 @@ class Client
     /**
      * Make a DELETE request.
      *
-     * @param string $path
-     * @param array|null $data
-     * @param array $options
-     * @return array
      * @throws MagpieException
      */
     public function delete(string $path, ?array $data = null, array $options = []): array
@@ -414,8 +367,6 @@ class Client
 
     /**
      * Get the current configuration.
-     *
-     * @return Config
      */
     public function getConfig(): Config
     {
@@ -424,13 +375,12 @@ class Client
 
     /**
      * Test connectivity to the Magpie API.
-     *
-     * @return bool
      */
     public function ping(): bool
     {
         try {
             $this->get('/ping');
+
             return true;
         } catch (MagpieException $e) {
             return false;
