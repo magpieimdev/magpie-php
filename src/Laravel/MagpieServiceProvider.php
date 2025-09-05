@@ -19,14 +19,12 @@ class MagpieServiceProvider extends ServiceProvider implements DeferrableProvide
 {
     /**
      * Register services.
-     *
-     * @return void
      */
     public function register(): void
     {
         // Merge default configuration
         $this->mergeConfigFrom(
-            __DIR__ . '/../../config/magpie.php',
+            __DIR__.'/../../config/magpie.php',
             'magpie'
         );
 
@@ -36,9 +34,7 @@ class MagpieServiceProvider extends ServiceProvider implements DeferrableProvide
 
             // Validate required configuration
             if (empty($config['secret_key'])) {
-                throw new \InvalidArgumentException(
-                    'Magpie secret key is required. Please set MAGPIE_SECRET_KEY in your .env file or publish the magpie config.'
-                );
+                throw new \InvalidArgumentException('Magpie secret key is required. Please set MAGPIE_SECRET_KEY in your .env file or publish the magpie config.');
             }
 
             $httpConfig = new Config([
@@ -53,7 +49,7 @@ class MagpieServiceProvider extends ServiceProvider implements DeferrableProvide
                 'defaultHeaders' => $config['default_headers'] ?? [],
             ]);
 
-            $logger = $config['logging']['enabled'] && $app->bound('log') 
+            $logger = $config['logging']['enabled'] && $app->bound('log')
                 ? $app->make('log')->channel($config['logging']['channel'])
                 : null;
 
@@ -66,15 +62,13 @@ class MagpieServiceProvider extends ServiceProvider implements DeferrableProvide
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
     public function boot(): void
     {
         // Publish configuration file
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../../config/magpie.php' => config_path('magpie.php'),
+                __DIR__.'/../../config/magpie.php' => config_path('magpie.php'),
             ], 'magpie-config');
 
             // Publish migrations if they exist
@@ -100,8 +94,6 @@ class MagpieServiceProvider extends ServiceProvider implements DeferrableProvide
 
     /**
      * Register event listeners for Magpie operations.
-     *
-     * @return void
      */
     protected function registerEventListeners(): void
     {

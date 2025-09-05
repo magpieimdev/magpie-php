@@ -85,32 +85,26 @@ class Config
 
     /**
      * Get the full API base URL.
-     *
-     * @return string
      */
     public function getApiUrl(): string
     {
-        return rtrim($this->baseUrl, '/') . '/' . ltrim($this->apiVersion, '/');
+        return rtrim($this->baseUrl, '/').'/'.ltrim($this->apiVersion, '/');
     }
 
     /**
      * Build the User-Agent string.
-     *
-     * @return string
      */
     private function buildUserAgent(): string
     {
         $phpVersion = PHP_VERSION;
         $osName = php_uname('s');
         $osVersion = php_uname('r');
-        
+
         return "magpie-php/1.0.0 (PHP/{$phpVersion}; {$osName}/{$osVersion})";
     }
 
     /**
      * Convert configuration to array.
-     *
-     * @return array
      */
     public function toArray(): array
     {

@@ -16,7 +16,7 @@ class AuthenticationException extends MagpieException
      * Create a new AuthenticationException.
      *
      * @param string $message The error message
-     * @param mixed ...$args Additional constructor arguments
+     * @param mixed  ...$args Additional constructor arguments
      */
     public function __construct(string $message = 'Authentication failed', ...$args)
     {

@@ -7,11 +7,11 @@ namespace Magpie;
 use Magpie\Http\Client;
 use Magpie\Http\Config;
 use Magpie\Resources\ChargesResource;
-use Magpie\Resources\CustomersResource;
-use Magpie\Resources\SourcesResource;
 use Magpie\Resources\CheckoutResource;
-use Magpie\Resources\PaymentRequestsResource;
+use Magpie\Resources\CustomersResource;
 use Magpie\Resources\PaymentLinksResource;
+use Magpie\Resources\PaymentRequestsResource;
+use Magpie\Resources\SourcesResource;
 use Magpie\Resources\WebhooksResource;
 use Psr\Log\LoggerInterface;
 
@@ -88,11 +88,11 @@ class Magpie
     /**
      * Create a new Magpie SDK client instance.
      *
-     * @param string $secretKey Your Magpie secret API key (must start with 'sk_')
-     * @param Config|array|null $config Optional configuration settings for the client
-     * @param LoggerInterface|null $logger Optional logger for debug information
+     * @param string               $secretKey Your Magpie secret API key (must start with 'sk_')
+     * @param Config|array|null    $config    Optional configuration settings for the client
+     * @param LoggerInterface|null $logger    Optional logger for debug information
      *
-     * @throws \Magpie\Exceptions\ConfigurationException When secretKey is invalid
+     * @throws Exceptions\ConfigurationException When secretKey is invalid
      *
      * @example
      * ```php
@@ -138,8 +138,6 @@ class Magpie
      * This provides access to the underlying HTTP client for advanced usage
      * or custom API calls not covered by the resource classes.
      *
-     * @return Client
-     *
      * @example
      * ```php
      * $client = $magpie->getClient();
@@ -153,8 +151,6 @@ class Magpie
 
     /**
      * Get the current configuration.
-     *
-     * @return Config
      *
      * @example
      * ```php
@@ -210,8 +206,6 @@ class Magpie
 
     /**
      * Get the API version being used.
-     *
-     * @return string
      */
     public function getApiVersion(): string
     {
@@ -220,8 +214,6 @@ class Magpie
 
     /**
      * Get the base URL being used for API requests.
-     *
-     * @return string
      */
     public function getBaseUrl(): string
     {

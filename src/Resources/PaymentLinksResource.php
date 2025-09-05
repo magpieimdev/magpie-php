@@ -32,11 +32,13 @@ class PaymentLinksResource extends BaseResource
      * Payment links provide a hosted payment page accessible via a shareable URL.
      * No coding required - perfect for social media, email campaigns, or instant invoicing.
      *
-     * @param array $params The parameters for creating the payment link
+     * @param array $params  The parameters for creating the payment link
      * @param array $options Additional request options
+     *
      * @return array Created payment link data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $paymentLink = $magpie->paymentLinks->create([
@@ -61,9 +63,11 @@ class PaymentLinksResource extends BaseResource
     /**
      * Retrieve an existing payment link by ID.
      *
-     * @param string $id The unique identifier of the payment link
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment link
+     * @param array  $options Additional request options
+     *
      * @return array Payment link data
+     *
      * @throws MagpieException
      */
     public function retrieve(string $id, array $options = []): array
@@ -74,10 +78,12 @@ class PaymentLinksResource extends BaseResource
     /**
      * Update an existing payment link.
      *
-     * @param string $id The unique identifier of the payment link to update
-     * @param array $params The update parameters
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment link to update
+     * @param array  $params  The update parameters
+     * @param array  $options Additional request options
+     *
      * @return array Updated payment link data
+     *
      * @throws MagpieException
      */
     public function update(string $id, array $params, array $options = []): array
@@ -88,9 +94,11 @@ class PaymentLinksResource extends BaseResource
     /**
      * Activate a payment link, making it available for payments.
      *
-     * @param string $id The unique identifier of the payment link to activate
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment link to activate
+     * @param array  $options Additional request options
+     *
      * @return array Activated payment link data
+     *
      * @throws MagpieException
      */
     public function activate(string $id, array $options = []): array
@@ -104,9 +112,11 @@ class PaymentLinksResource extends BaseResource
      * Once deactivated, customers will no longer be able to complete
      * payments through this payment link.
      *
-     * @param string $id The unique identifier of the payment link to deactivate
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment link to deactivate
+     * @param array  $options Additional request options
+     *
      * @return array Deactivated payment link data
+     *
      * @throws MagpieException
      */
     public function deactivate(string $id, array $options = []): array

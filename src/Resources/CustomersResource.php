@@ -24,11 +24,13 @@ class CustomersResource extends BaseResource
     /**
      * Create a new customer.
      *
-     * @param array $params Customer creation parameters
+     * @param array $params  Customer creation parameters
      * @param array $options Additional request options
+     *
      * @return array Created customer data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $customer = $magpie->customers->create([
@@ -47,9 +49,11 @@ class CustomersResource extends BaseResource
     /**
      * Retrieve a customer by ID.
      *
-     * @param string $id Customer ID
-     * @param array $options Additional request options
+     * @param string $id      Customer ID
+     * @param array  $options Additional request options
+     *
      * @return array Customer data
+     *
      * @throws MagpieException
      */
     public function retrieve(string $id, array $options = []): array
@@ -60,10 +64,12 @@ class CustomersResource extends BaseResource
     /**
      * Update a customer.
      *
-     * @param string $id Customer ID
-     * @param array $params Update parameters
-     * @param array $options Additional request options
+     * @param string $id      Customer ID
+     * @param array  $params  Update parameters
+     * @param array  $options Additional request options
+     *
      * @return array Updated customer data
+     *
      * @throws MagpieException
      */
     public function update(string $id, array $params, array $options = []): array
@@ -74,11 +80,13 @@ class CustomersResource extends BaseResource
     /**
      * Retrieve a customer by their email address.
      *
-     * @param string $email The email address of the customer
-     * @param array $options Additional request options
+     * @param string $email   The email address of the customer
+     * @param array  $options Additional request options
+     *
      * @return array Customer data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $customer = $magpie->customers->retrieveByEmail('john@example.com');
@@ -86,18 +94,20 @@ class CustomersResource extends BaseResource
      */
     public function retrieveByEmail(string $email, array $options = []): array
     {
-        return $this->customAction('GET', $this->buildPath() . '/email', ['email' => $email], $options);
+        return $this->customAction('GET', $this->buildPath().'/email', ['email' => $email], $options);
     }
 
     /**
      * Attach a payment source to a customer.
      *
-     * @param string $id The unique identifier of the customer
-     * @param string $source The ID of the payment source to attach
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the customer
+     * @param string $source  The ID of the payment source to attach
+     * @param array  $options Additional request options
+     *
      * @return array Updated customer data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $updatedCustomer = $magpie->customers->attachSource(
@@ -114,12 +124,14 @@ class CustomersResource extends BaseResource
     /**
      * Detach a payment source from a customer.
      *
-     * @param string $id The unique identifier of the customer
-     * @param string $source The ID of the payment source to detach
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the customer
+     * @param string $source  The ID of the payment source to detach
+     * @param array  $options Additional request options
+     *
      * @return array Updated customer data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $updatedCustomer = $magpie->customers->detachSource(

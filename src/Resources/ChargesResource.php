@@ -32,9 +32,11 @@ class ChargesResource extends BaseResource
      * A charge represents a request to transfer money from a customer to your account.
      * You can create charges directly or authorize them first for later capture.
      *
-     * @param array $params The parameters for creating the charge
+     * @param array $params  The parameters for creating the charge
      * @param array $options Additional request options (e.g., idempotency key)
+     *
      * @return array The created charge data
+     *
      * @throws MagpieException
      *
      * @example
@@ -56,9 +58,11 @@ class ChargesResource extends BaseResource
     /**
      * Retrieve an existing charge by its ID.
      *
-     * @param string $id The unique identifier of the charge to retrieve
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the charge to retrieve
+     * @param array  $options Additional request options
+     *
      * @return array The charge data
+     *
      * @throws MagpieException
      *
      * @example
@@ -77,10 +81,12 @@ class ChargesResource extends BaseResource
      * When you create a charge with `capture: false`, it will be authorized but not
      * captured. Use this method to capture the authorized amount (or a portion of it).
      *
-     * @param string $id The unique identifier of the charge to capture
-     * @param array $params The capture parameters (amount, etc.)
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the charge to capture
+     * @param array  $params  The capture parameters (amount, etc.)
+     * @param array  $options Additional request options
+     *
      * @return array The updated charge data
+     *
      * @throws MagpieException
      *
      * @example
@@ -107,10 +113,12 @@ class ChargesResource extends BaseResource
      * This method is used for direct bank payments where additional customer
      * authentication is required.
      *
-     * @param string $id The unique identifier of the charge to verify
-     * @param array $params The verification parameters
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the charge to verify
+     * @param array  $params  The verification parameters
+     * @param array  $options Additional request options
+     *
      * @return array The verified charge data
+     *
      * @throws MagpieException
      *
      * @example
@@ -132,9 +140,11 @@ class ChargesResource extends BaseResource
      * This method can only be used on charges that have been authorized but not yet
      * captured. Once voided, the authorization is released and cannot be captured.
      *
-     * @param string $id The unique identifier of the charge to void
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the charge to void
+     * @param array  $options Additional request options
+     *
      * @return array The voided charge data
+     *
      * @throws MagpieException
      *
      * @example
@@ -153,10 +163,12 @@ class ChargesResource extends BaseResource
      * Refunds can be created for the full charge amount or a partial amount.
      * The refund will be processed back to the original payment method.
      *
-     * @param string $id The unique identifier of the charge to refund
-     * @param array $params The refund parameters (amount, reason, etc.)
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the charge to refund
+     * @param array  $params  The refund parameters (amount, reason, etc.)
+     * @param array  $options Additional request options
+     *
      * @return array The updated charge data with refund information
+     *
      * @throws MagpieException
      *
      * @example

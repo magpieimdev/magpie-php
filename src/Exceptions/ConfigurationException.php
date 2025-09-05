@@ -15,12 +15,12 @@ class ConfigurationException extends MagpieException
     /**
      * Create a new ConfigurationException instance.
      *
-     * @param string $message The error message
-     * @param string $type The error type (default: 'invalid_request_error')
-     * @param string|null $code The error code
-     * @param int $statusCode The HTTP status code (default: 400)
-     * @param array|null $headers Additional response headers
-     * @param \Throwable|null $previous Previous exception for chaining
+     * @param string          $message    The error message
+     * @param string          $type       The error type (default: 'invalid_request_error')
+     * @param string|null     $code       The error code
+     * @param int             $statusCode The HTTP status code (default: 400)
+     * @param array|null      $headers    Additional response headers
+     * @param \Throwable|null $previous   Previous exception for chaining
      */
     public function __construct(
         string $message,

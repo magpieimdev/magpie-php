@@ -39,12 +39,13 @@ class WebhooksResource extends BaseResource
     /**
      * Verify a webhook signature using timing-safe comparison.
      *
-     * @param string $payload Raw webhook payload (string)
+     * @param string $payload   Raw webhook payload (string)
      * @param string $signature Signature from webhook headers
-     * @param string $secret Your webhook endpoint secret
-     * @param array $config Optional configuration for signature verification
+     * @param string $secret    Your webhook endpoint secret
+     * @param array  $config    Optional configuration for signature verification
+     *
      * @return bool True if the signature is valid
-     * 
+     *
      * @example
      * ```php
      * $isValid = $magpie->webhooks->verifySignature(
@@ -62,11 +63,11 @@ class WebhooksResource extends BaseResource
         array $config = []
     ): bool {
         $finalConfig = array_merge(self::DEFAULT_CONFIG, $config);
-        
+
         try {
             $parsedSignature = $this->parseSignature($signature, $finalConfig['prefix']);
             $expectedSignature = $this->generateSignature($payload, $secret, $finalConfig['algorithm']);
-            
+
             return $this->timingSafeEqual($parsedSignature['signature'], $expectedSignature);
         } catch (\Exception $e) {
             return false;
@@ -76,13 +77,15 @@ class WebhooksResource extends BaseResource
     /**
      * Construct a webhook event from a verified payload.
      *
-     * @param string $payload Raw webhook payload
-     * @param string $signature Signature header value  
-     * @param string $secret Your webhook endpoint secret
-     * @param array $config Optional configuration
+     * @param string $payload   Raw webhook payload
+     * @param string $signature Signature header value
+     * @param string $secret    Your webhook endpoint secret
+     * @param array  $config    Optional configuration
+     *
      * @return array Parsed and verified webhook event
+     *
      * @throws MagpieException When signature verification or JSON parsing fails
-     * 
+     *
      * @example
      * ```php
      * $event = $magpie->webhooks->constructEvent(
@@ -90,7 +93,7 @@ class WebhooksResource extends BaseResource
      *     $request->header('magpie-signature'),
      *     'whsec_your_secret_here'
      * );
-     * 
+     *
      * switch ($event['type']) {
      *     case 'charge.succeeded':
      *         // Handle successful payment
@@ -107,28 +110,29 @@ class WebhooksResource extends BaseResource
         string $secret,
         array $config = []
     ): array {
-        if (!$this->verifySignature($payload, $signature, $secret, $config)) {
+        if (! $this->verifySignature($payload, $signature, $secret, $config)) {
             throw new MagpieException('Invalid webhook signature', 'webhook_error');
         }
-        
+
         try {
             $event = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw new MagpieException('Invalid JSON in webhook payload', 'webhook_error', previous: $e);
         }
-        
+
         return $event;
     }
 
     /**
      * Generate a test webhook signature (for testing purposes).
      *
-     * @param string $payload Payload to generate signature for
-     * @param string $secret Webhook secret
+     * @param string $payload   Payload to generate signature for
+     * @param string $secret    Webhook secret
      * @param string $algorithm Hashing algorithm (default: 'sha256')
-     * @param string $prefix Signature prefix (default: 'v1=')
+     * @param string $prefix    Signature prefix (default: 'v1=')
+     *
      * @return string Generated signature string
-     * 
+     *
      * @example
      * ```php
      * // For testing your webhook handler
@@ -146,8 +150,8 @@ class WebhooksResource extends BaseResource
         string $prefix = 'v1='
     ): string {
         $timestamp = time();
-        $signature = hash_hmac($algorithm, $timestamp . '.' . $payload, $secret);
-        
+        $signature = hash_hmac($algorithm, $timestamp.'.'.$payload, $secret);
+
         return "t={$timestamp},{$prefix}{$signature}";
     }
 
@@ -155,10 +159,12 @@ class WebhooksResource extends BaseResource
      * Verify webhook signature with timestamp validation.
      *
      * @param string $payload Raw webhook payload
-     * @param array $headers Request headers array
-     * @param string $secret Webhook endpoint secret
-     * @param array $config Optional configuration
+     * @param array  $headers Request headers array
+     * @param string $secret  Webhook endpoint secret
+     * @param array  $config  Optional configuration
+     *
      * @return bool True if both signature and timestamp are valid
+     *
      * @throws MagpieException When signature or timestamp validation fails
      */
     public function verifySignatureWithTimestamp(
@@ -168,27 +174,19 @@ class WebhooksResource extends BaseResource
         array $config = []
     ): bool {
         $finalConfig = array_merge(self::DEFAULT_CONFIG, $config);
-        
+
         $signature = $this->getHeader($headers, $finalConfig['signatureHeader']);
         $timestamp = $this->getHeader($headers, $finalConfig['timestampHeader']);
-        
-        if (!$signature) {
-            throw new MagpieException(
-                "Missing signature header: {$finalConfig['signatureHeader']}",
-                'invalid_request_error',
-                'webhook_signature_missing'
-            );
+
+        if (! $signature) {
+            throw new MagpieException("Missing signature header: {$finalConfig['signatureHeader']}", 'invalid_request_error', 'webhook_signature_missing');
         }
-        
+
         // Verify timestamp if provided
-        if ($timestamp && !$this->isValidTimestamp((int) $timestamp, $finalConfig['tolerance'])) {
-            throw new MagpieException(
-                'Webhook timestamp is outside tolerance window',
-                'invalid_request_error',
-                'webhook_timestamp_invalid'
-            );
+        if ($timestamp && ! $this->isValidTimestamp((int) $timestamp, $finalConfig['tolerance'])) {
+            throw new MagpieException('Webhook timestamp is outside tolerance window', 'invalid_request_error', 'webhook_timestamp_invalid');
         }
-        
+
         return $this->verifySignature($payload, $signature, $secret, $config);
     }
 
@@ -197,21 +195,18 @@ class WebhooksResource extends BaseResource
      *
      * @param int $timestamp Unix timestamp to validate
      * @param int $tolerance Maximum age in seconds (default: 300 = 5 minutes)
+     *
      * @return bool True if timestamp is valid
      */
     public function isValidTimestamp(int $timestamp, int $tolerance = 300): bool
     {
         $currentTime = time();
+
         return abs($currentTime - $timestamp) <= $tolerance;
     }
 
     /**
      * Generate HMAC signature for payload.
-     *
-     * @param string $payload
-     * @param string $secret
-     * @param string $algorithm
-     * @return string
      */
     private function generateSignature(string $payload, string $secret, string $algorithm): string
     {
@@ -221,49 +216,39 @@ class WebhooksResource extends BaseResource
     /**
      * Parse signature header value.
      *
-     * @param string $signature
-     * @param string $prefix
-     * @return array
      * @throws \Exception
      */
     private function parseSignature(string $signature, string $prefix): array
     {
-        if (!str_starts_with($signature, $prefix)) {
+        if (! str_starts_with($signature, $prefix)) {
             throw new \Exception("Invalid signature format. Expected prefix: {$prefix}");
         }
-        
+
         return [
             'version' => rtrim($prefix, '='),
-            'signature' => substr($signature, strlen($prefix))
+            'signature' => substr($signature, strlen($prefix)),
         ];
     }
 
     /**
      * Timing-safe string comparison to prevent timing attacks.
-     *
-     * @param string $a
-     * @param string $b
-     * @return bool
      */
     private function timingSafeEqual(string $a, string $b): bool
     {
         if (strlen($a) !== strlen($b)) {
             return false;
         }
-        
+
         return hash_equals($a, $b);
     }
 
     /**
      * Get header value handling both string and array cases.
-     *
-     * @param array $headers
-     * @param string $name
-     * @return string|null
      */
     private function getHeader(array $headers, string $name): ?string
     {
         $value = $headers[$name] ?? $headers[strtolower($name)] ?? null;
+
         return is_array($value) ? $value[0] : $value;
     }
 }

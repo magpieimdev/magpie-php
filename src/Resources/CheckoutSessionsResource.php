@@ -33,11 +33,13 @@ class CheckoutSessionsResource extends BaseResource
      * Creates a hosted payment page where customers can securely complete their
      * purchase. The session includes line items, payment options, and redirect URLs.
      *
-     * @param array $params The parameters for creating the checkout session
+     * @param array $params  The parameters for creating the checkout session
      * @param array $options Additional request options
+     *
      * @return array Created checkout session data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $session = $magpie->checkout->sessions->create([
@@ -52,7 +54,7 @@ class CheckoutSessionsResource extends BaseResource
      *     'cancel_url' => 'https://example.com/cancel',
      *     'customer_email' => 'customer@example.com'
      * ]);
-     * 
+     *
      * // Redirect customer to the checkout page
      * header('Location: ' . $session['url']);
      * ```
@@ -65,9 +67,11 @@ class CheckoutSessionsResource extends BaseResource
     /**
      * Retrieve an existing checkout session by ID.
      *
-     * @param string $id The unique identifier of the checkout session
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the checkout session
+     * @param array  $options Additional request options
+     *
      * @return array Checkout session data
+     *
      * @throws MagpieException
      */
     public function retrieve(string $id, array $options = []): array
@@ -81,10 +85,12 @@ class CheckoutSessionsResource extends BaseResource
      * For sessions created with authorization-only payment methods,
      * this captures the authorized amount (or a portion of it).
      *
-     * @param string $id The unique identifier of the checkout session
-     * @param array $params The capture parameters
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the checkout session
+     * @param array  $params  The capture parameters
+     * @param array  $options Additional request options
+     *
      * @return array Updated checkout session data
+     *
      * @throws MagpieException
      */
     public function capture(string $id, array $params, array $options = []): array
@@ -98,9 +104,11 @@ class CheckoutSessionsResource extends BaseResource
      * Once expired, customers will no longer be able to complete
      * payment through the checkout session URL.
      *
-     * @param string $id The unique identifier of the checkout session to expire
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the checkout session to expire
+     * @param array  $options Additional request options
+     *
      * @return array Expired checkout session data
+     *
      * @throws MagpieException
      */
     public function expire(string $id, array $options = []): array

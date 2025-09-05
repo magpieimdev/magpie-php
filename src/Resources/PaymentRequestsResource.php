@@ -33,11 +33,13 @@ class PaymentRequestsResource extends BaseResource
      * The customer receives a link to a secure payment page where they
      * can complete the payment.
      *
-     * @param array $params The parameters for creating the payment request
+     * @param array $params  The parameters for creating the payment request
      * @param array $options Additional request options
+     *
      * @return array Created payment request data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * $request = $magpie->paymentRequests->create([
@@ -62,9 +64,11 @@ class PaymentRequestsResource extends BaseResource
     /**
      * Retrieve an existing payment request by ID.
      *
-     * @param string $id The unique identifier of the payment request
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment request
+     * @param array  $options Additional request options
+     *
      * @return array Payment request data
+     *
      * @throws MagpieException
      */
     public function retrieve(string $id, array $options = []): array
@@ -78,9 +82,11 @@ class PaymentRequestsResource extends BaseResource
      * Sends the payment request notification again via the originally
      * configured channels (email, SMS, or both).
      *
-     * @param string $id The unique identifier of the payment request to resend
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment request to resend
+     * @param array  $options Additional request options
+     *
      * @return array Payment request data
+     *
      * @throws MagpieException
      */
     public function resend(string $id, array $options = []): array
@@ -94,10 +100,12 @@ class PaymentRequestsResource extends BaseResource
      * Once voided, the customer will no longer be able to pay the request,
      * and any payment attempts will be rejected.
      *
-     * @param string $id The unique identifier of the payment request to void
-     * @param array $params The void parameters (reason, etc.)
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the payment request to void
+     * @param array  $params  The void parameters (reason, etc.)
+     * @param array  $options Additional request options
+     *
      * @return array Voided payment request data
+     *
      * @throws MagpieException
      */
     public function void(string $id, array $params, array $options = []): array

@@ -27,11 +27,13 @@ class SourcesResource extends BaseResource
      * Payment sources represent payment methods like credit cards or bank accounts
      * that can be used to process payments. Sources can be reusable or single-use.
      *
-     * @param array $params The parameters for creating the source
+     * @param array $params  The parameters for creating the source
      * @param array $options Additional request options
+     *
      * @return array Created source data
+     *
      * @throws MagpieException
-     * 
+     *
      * @example
      * ```php
      * // Create a card source
@@ -59,9 +61,11 @@ class SourcesResource extends BaseResource
     /**
      * Retrieve an existing payment source by ID.
      *
-     * @param string $id The unique identifier of the source
-     * @param array $options Additional request options
+     * @param string $id      The unique identifier of the source
+     * @param array  $options Additional request options
+     *
      * @return array Source data
+     *
      * @throws MagpieException
      */
     public function retrieve(string $id, array $options = []): array

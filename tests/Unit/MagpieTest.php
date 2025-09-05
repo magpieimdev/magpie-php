@@ -17,7 +17,7 @@ class MagpieTest extends TestCase
     public function testCanInstantiateWithValidSecretKey(): void
     {
         $magpie = new Magpie('sk_test_valid_key');
-        
+
         $this->assertInstanceOf(Magpie::class, $magpie);
         $this->assertSame('v2', $magpie->getApiVersion());
         $this->assertSame('https://api.magpie.im', $magpie->getBaseUrl());
@@ -28,11 +28,11 @@ class MagpieTest extends TestCase
         $config = new Config([
             'baseUrl' => 'https://custom-api.magpie.im',
             'apiVersion' => 'v1',
-            'timeout' => 60
+            'timeout' => 60,
         ]);
 
         $magpie = new Magpie('sk_test_valid_key', $config);
-        
+
         $this->assertSame('v1', $magpie->getApiVersion());
         $this->assertSame('https://custom-api.magpie.im', $magpie->getBaseUrl());
         $this->assertSame(60, $magpie->getConfig()->timeout);
@@ -42,9 +42,9 @@ class MagpieTest extends TestCase
     {
         $magpie = new Magpie('sk_test_valid_key', [
             'baseUrl' => 'https://test-api.magpie.im',
-            'timeout' => 45
+            'timeout' => 45,
         ]);
-        
+
         $this->assertSame('https://test-api.magpie.im', $magpie->getBaseUrl());
         $this->assertSame(45, $magpie->getConfig()->timeout);
     }
@@ -53,7 +53,7 @@ class MagpieTest extends TestCase
     {
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage('Secret key is required');
-        
+
         new Magpie('');
     }
 
@@ -61,14 +61,14 @@ class MagpieTest extends TestCase
     {
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage('Invalid secret key format. Secret key must start with "sk_"');
-        
+
         new Magpie('invalid_key_format');
     }
 
     public function testHasAllResourceInstances(): void
     {
         $magpie = new Magpie('sk_test_valid_key');
-        
+
         $this->assertInstanceOf(\Magpie\Resources\ChargesResource::class, $magpie->charges);
         $this->assertInstanceOf(\Magpie\Resources\CustomersResource::class, $magpie->customers);
         $this->assertInstanceOf(\Magpie\Resources\SourcesResource::class, $magpie->sources);
@@ -81,9 +81,9 @@ class MagpieTest extends TestCase
     public function testCanSetDebugMode(): void
     {
         $magpie = new Magpie('sk_test_valid_key');
-        
+
         $this->assertFalse($magpie->getConfig()->debug);
-        
+
         $magpie->setDebug(true);
         $this->assertTrue($magpie->getConfig()->debug);
     }

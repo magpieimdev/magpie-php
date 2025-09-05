@@ -30,19 +30,19 @@ use Illuminate\Support\Facades\Facade;
  * ]);
  * ```
  *
- * @method static \Magpie\Resources\ChargesResource charges()
- * @method static \Magpie\Resources\CustomersResource customers()
- * @method static \Magpie\Resources\SourcesResource sources()
- * @method static \Magpie\Resources\CheckoutResource checkout()
+ * @method static \Magpie\Resources\ChargesResource         charges()
+ * @method static \Magpie\Resources\CustomersResource       customers()
+ * @method static \Magpie\Resources\SourcesResource         sources()
+ * @method static \Magpie\Resources\CheckoutResource        checkout()
  * @method static \Magpie\Resources\PaymentRequestsResource paymentRequests()
- * @method static \Magpie\Resources\PaymentLinksResource paymentLinks()
- * @method static \Magpie\Resources\WebhooksResource webhooks()
- * @method static \Magpie\Http\Client getClient()
- * @method static \Magpie\Http\Config getConfig()
- * @method static bool ping()
- * @method static void setDebug(bool $debug)
- * @method static string getApiVersion()
- * @method static string getBaseUrl()
+ * @method static \Magpie\Resources\PaymentLinksResource    paymentLinks()
+ * @method static \Magpie\Resources\WebhooksResource        webhooks()
+ * @method static \Magpie\Http\Client                       getClient()
+ * @method static \Magpie\Http\Config                       getConfig()
+ * @method static bool                                      ping()
+ * @method static void                                      setDebug(bool $debug)
+ * @method static string                                    getApiVersion()
+ * @method static string                                    getBaseUrl()
  *
  * @see \Magpie\Magpie
  */
@@ -50,8 +50,6 @@ class Magpie extends Facade
 {
     /**
      * Get the registered name of the component.
-     *
-     * @return string
      */
     protected static function getFacadeAccessor(): string
     {

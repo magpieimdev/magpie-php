@@ -6,10 +6,10 @@ declare(strict_types=1);
  * This file is part of the Magpie PHP SDK.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 // Set up test environment
-if (!defined('MAGPIE_TEST_MODE')) {
+if (! defined('MAGPIE_TEST_MODE')) {
     define('MAGPIE_TEST_MODE', true);
 }
 

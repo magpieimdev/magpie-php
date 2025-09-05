@@ -7,7 +7,6 @@ namespace Magpie\Tests\Unit\Resources;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
 use Magpie\Resources\SourcesResource;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,14 +16,14 @@ class SourcesResourceTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
     }
 
     public function testCreateCardSource(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'card',
             'card' => [
@@ -32,14 +31,14 @@ class SourcesResourceTest extends TestCase
                 'number' => '4242424242424242',
                 'exp_month' => '12',
                 'exp_year' => '2025',
-                'cvc' => '123'
+                'cvc' => '123',
             ],
             'redirect' => [
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
-            ]
+                'fail' => 'https://example.com/fail',
+            ],
         ];
-        
+
         $expectedResponse = [
             'id' => 'src_test_123',
             'object' => 'source',
@@ -51,23 +50,23 @@ class SourcesResourceTest extends TestCase
                 'last4' => '4242',
                 'exp_month' => '12',
                 'exp_year' => '2025',
-                'brand' => 'visa'
+                'brand' => 'visa',
             ],
             'redirect' => [
                 'url' => 'https://pay.magpie.im/redirect/src_test_123',
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
+                'fail' => 'https://example.com/fail',
             ],
-            'created' => 1640995200
+            'created' => 1640995200,
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params);
-        
+
         $this->assertSame('src_test_123', $result['id']);
         $this->assertSame('source', $result['object']);
         $this->assertSame('card', $result['type']);
@@ -79,19 +78,19 @@ class SourcesResourceTest extends TestCase
 
     public function testCreateGCashSource(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'gcash',
             'amount' => 50000,
             'currency' => 'php',
             'redirect' => [
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
-            ]
+                'fail' => 'https://example.com/fail',
+            ],
         ];
-        
+
         $expectedResponse = [
             'id' => 'src_gcash_456',
             'object' => 'source',
@@ -103,17 +102,17 @@ class SourcesResourceTest extends TestCase
             'redirect' => [
                 'url' => 'https://gcash.magpie.im/redirect/src_gcash_456',
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
-            ]
+                'fail' => 'https://example.com/fail',
+            ],
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params);
-        
+
         $this->assertSame('src_gcash_456', $result['id']);
         $this->assertSame('gcash', $result['type']);
         $this->assertSame('pending', $result['status']);
@@ -123,22 +122,22 @@ class SourcesResourceTest extends TestCase
 
     public function testCreatePayMayaSource(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'paymaya',
             'amount' => 75000,
             'currency' => 'php',
             'owner' => [
-                'email' => 'customer@example.com'
+                'email' => 'customer@example.com',
             ],
             'redirect' => [
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
-            ]
+                'fail' => 'https://example.com/fail',
+            ],
         ];
-        
+
         $expectedResponse = [
             'id' => 'src_paymaya_789',
             'object' => 'source',
@@ -148,17 +147,17 @@ class SourcesResourceTest extends TestCase
             'currency' => 'php',
             'owner' => [
                 'email' => 'customer@example.com',
-                'verified_email' => false
-            ]
+                'verified_email' => false,
+            ],
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params);
-        
+
         $this->assertSame('src_paymaya_789', $result['id']);
         $this->assertSame('paymaya', $result['type']);
         $this->assertSame(75000, $result['amount']);
@@ -167,9 +166,9 @@ class SourcesResourceTest extends TestCase
 
     public function testRetrieve(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $sourceId = 'src_test_123';
         $expectedResponse = [
             'id' => $sourceId,
@@ -182,18 +181,18 @@ class SourcesResourceTest extends TestCase
                 'last4' => '4242',
                 'exp_month' => '12',
                 'exp_year' => '2025',
-                'brand' => 'visa'
+                'brand' => 'visa',
             ],
-            'usage' => 'reusable'
+            'usage' => 'reusable',
         ];
-        
+
         $client->shouldReceive('get')
             ->once()
             ->with("sources/{$sourceId}", null, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->retrieve($sourceId);
-        
+
         $this->assertSame($sourceId, $result['id']);
         $this->assertSame('source', $result['object']);
         $this->assertSame('card', $result['type']);
@@ -203,31 +202,31 @@ class SourcesResourceTest extends TestCase
 
     public function testCreateWithMinimalParams(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'gcash',
             'amount' => 10000,
-            'currency' => 'php'
+            'currency' => 'php',
         ];
-        
+
         $expectedResponse = [
             'id' => 'src_minimal_123',
             'object' => 'source',
             'type' => 'gcash',
             'status' => 'pending',
             'amount' => 10000,
-            'currency' => 'php'
+            'currency' => 'php',
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params);
-        
+
         $this->assertSame('src_minimal_123', $result['id']);
         $this->assertSame('gcash', $result['type']);
         $this->assertSame(10000, $result['amount']);
@@ -235,9 +234,9 @@ class SourcesResourceTest extends TestCase
 
     public function testCreateWithOptions(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'card',
             'card' => [
@@ -245,36 +244,36 @@ class SourcesResourceTest extends TestCase
                 'number' => '5555555555554444',
                 'exp_month' => '06',
                 'exp_year' => '2026',
-                'cvc' => '456'
-            ]
+                'cvc' => '456',
+            ],
         ];
-        
+
         $options = ['idempotency_key' => 'source_create_123'];
-        
+
         $expectedResponse = [
             'id' => 'src_options_456',
             'object' => 'source',
-            'type' => 'card'
+            'type' => 'card',
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, $options)
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params, $options);
-        
+
         $this->assertSame('src_options_456', $result['id']);
     }
 
     public function testRetrieveWithOptions(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $sourceId = 'src_test_123';
         $options = ['expand' => ['charges']];
-        
+
         $expectedResponse = [
             'id' => $sourceId,
             'object' => 'source',
@@ -282,18 +281,18 @@ class SourcesResourceTest extends TestCase
             'charges' => [
                 [
                     'id' => 'ch_123',
-                    'amount' => 25000
-                ]
-            ]
+                    'amount' => 25000,
+                ],
+            ],
         ];
-        
+
         $client->shouldReceive('get')
             ->once()
             ->with("sources/{$sourceId}", null, $options)
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->retrieve($sourceId, $options);
-        
+
         $this->assertSame($sourceId, $result['id']);
         $this->assertArrayHasKey('charges', $result);
         $this->assertSame('ch_123', $result['charges'][0]['id']);
@@ -301,19 +300,19 @@ class SourcesResourceTest extends TestCase
 
     public function testCreateBankTransferSource(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'bank_transfer',
             'amount' => 100000,
             'currency' => 'php',
             'owner' => [
                 'name' => 'John Doe',
-                'email' => 'john@example.com'
-            ]
+                'email' => 'john@example.com',
+            ],
         ];
-        
+
         $expectedResponse = [
             'id' => 'src_bank_123',
             'object' => 'source',
@@ -323,22 +322,22 @@ class SourcesResourceTest extends TestCase
             'currency' => 'php',
             'owner' => [
                 'name' => 'John Doe',
-                'email' => 'john@example.com'
+                'email' => 'john@example.com',
             ],
             'bank_transfer' => [
                 'bank' => 'BPI',
                 'account_number' => '1234567890',
-                'account_name' => 'Magpie Philippines Inc'
-            ]
+                'account_name' => 'Magpie Philippines Inc',
+            ],
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params);
-        
+
         $this->assertSame('src_bank_123', $result['id']);
         $this->assertSame('bank_transfer', $result['type']);
         $this->assertSame('BPI', $result['bank_transfer']['bank']);
@@ -347,9 +346,9 @@ class SourcesResourceTest extends TestCase
 
     public function testHandlesValidationErrors(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'card',
             'card' => [
@@ -357,66 +356,66 @@ class SourcesResourceTest extends TestCase
                 'number' => '1234567890123456',  // Invalid card number
                 'exp_month' => '13',  // Invalid month
                 'exp_year' => '2020',  // Expired year
-                'cvc' => '12'  // Invalid CVC
-            ]
+                'cvc' => '12',  // Invalid CVC
+            ],
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andThrow(new MagpieException('Invalid card details', 'card_error'));
-            
+
         $this->expectException(MagpieException::class);
         $this->expectExceptionMessage('Invalid card details');
-        
+
         $resource->create($params);
     }
 
     public function testHandlesUnsupportedSourceType(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'unsupported_type',
             'amount' => 25000,
-            'currency' => 'php'
+            'currency' => 'php',
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andThrow(new MagpieException('Unsupported source type', 'invalid_request_error'));
-            
+
         $this->expectException(MagpieException::class);
         $this->expectExceptionMessage('Unsupported source type');
-        
+
         $resource->create($params);
     }
 
     public function testRetrieveNonExistentSource(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $sourceId = 'src_nonexistent_999';
-        
+
         $client->shouldReceive('get')
             ->once()
             ->with("sources/{$sourceId}", null, [])
             ->andThrow(new MagpieException('Source not found', 'resource_not_found'));
-            
+
         $this->expectException(MagpieException::class);
         $this->expectExceptionMessage('Source not found');
-        
+
         $resource->retrieve($sourceId);
     }
 
     public function testCreateReusableCardSource(): void
     {
-        $client = Mockery::mock(Client::class);
+        $client = \Mockery::mock(Client::class);
         $resource = new SourcesResource($client);
-        
+
         $params = [
             'type' => 'card',
             'card' => [
@@ -424,11 +423,11 @@ class SourcesResourceTest extends TestCase
                 'number' => '4000000000000002',
                 'exp_month' => '12',
                 'exp_year' => '2025',
-                'cvc' => '123'
+                'cvc' => '123',
             ],
-            'usage' => 'reusable'
+            'usage' => 'reusable',
         ];
-        
+
         $expectedResponse = [
             'id' => 'src_reusable_123',
             'object' => 'source',
@@ -438,17 +437,17 @@ class SourcesResourceTest extends TestCase
             'card' => [
                 'name' => 'Reusable Card',
                 'last4' => '0002',
-                'brand' => 'visa'
-            ]
+                'brand' => 'visa',
+            ],
         ];
-        
+
         $client->shouldReceive('post')
             ->once()
             ->with('sources', $params, [])
             ->andReturn($expectedResponse);
-            
+
         $result = $resource->create($params);
-        
+
         $this->assertSame('src_reusable_123', $result['id']);
         $this->assertSame('reusable', $result['usage']);
         $this->assertSame('verified', $result['status']);
