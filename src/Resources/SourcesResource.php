@@ -10,52 +10,17 @@ use Magpie\Http\Client;
 /**
  * Resource class for managing payment sources.
  *
- * The SourcesResource provides methods to create and retrieve payment sources
- * such as credit cards, debit cards, and bank accounts. Sources represent
- * payment methods that can be attached to customers or used for one-time payments.
+ * The SourcesResource provides methods to retrieve payment sources that have been
+ * securely created through Magpie's frontend SDKs or secure tokenization services.
+ *
+ * For PCI compliance, raw card data creation is not supported through this server-side SDK.
+ * Use Magpie's client-side SDKs to securely collect and tokenize payment information.
  */
 class SourcesResource extends BaseResource
 {
     public function __construct(Client $client)
     {
         parent::__construct($client, '/sources');
-    }
-
-    /**
-     * Create a new payment source.
-     *
-     * Payment sources represent payment methods like credit cards or bank accounts
-     * that can be used to process payments. Sources can be reusable or single-use.
-     *
-     * @param array $params  The parameters for creating the source
-     * @param array $options Additional request options
-     *
-     * @return array Created source data
-     *
-     * @throws MagpieException
-     *
-     * @example
-     * ```php
-     * // Create a card source
-     * $cardSource = $magpie->sources->create([
-     *     'type' => 'card',
-     *     'card' => [
-     *         'name' => 'John Doe',
-     *         'number' => '4242424242424242',
-     *         'exp_month' => '12',
-     *         'exp_year' => '2025',
-     *         'cvc' => '123'
-     *     ],
-     *     'redirect' => [
-     *         'success' => 'https://example.com/success',
-     *         'fail' => 'https://example.com/fail'
-     *     ]
-     * ]);
-     * ```
-     */
-    public function create(array $params, array $options = []): array
-    {
-        return parent::create($params, $options);
     }
 
     /**
