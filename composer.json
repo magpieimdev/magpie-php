@@ -1,6 +1,5 @@
 {
     "name": "magpieim/magpie-php",
-    "version": "1.0.0",
     "description": "The Magpie API Library for PHP enables you to work with Magpie APIs. Built for Laravel and modern PHP applications.",
     "keywords": [
         "magpie",
