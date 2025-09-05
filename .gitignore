@@ -15,8 +15,10 @@ Thumbs.db
 # PHP
 *.log
 .php_cs.cache
+.php-cs-fixer.cache
 .phpunit.cache/
 coverage-html/
+.phpstan/
 
 # Testing
 .phpunit.result.cache
