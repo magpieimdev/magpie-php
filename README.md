@@ -6,6 +6,7 @@ The official Magpie PHP library for seamless integration with Magpie's payment p
 [![PHP Version](https://img.shields.io/packagist/php-v/magpieim/magpie-php.svg?style=flat-square)](https://packagist.org/packages/magpieim/magpie-php)
 [![Total Downloads](https://img.shields.io/packagist/dt/magpieim/magpie-php.svg?style=flat-square)](https://packagist.org/packages/magpieim/magpie-php)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Packagist](https://img.shields.io/packagist/v/magpieim/magpie-php?label=packagist&style=flat-square)](https://packagist.org/packages/magpieim/magpie-php)
 
 ## Features
 
