@@ -59,13 +59,18 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
-        "test-coverage": "phpunit --coverage-html coverage",
+        "test": "phpunit --no-coverage",
+        "test-coverage": "phpunit --coverage-html coverage --coverage-text --coverage-clover=coverage.clover",
         "fix": "php-cs-fixer fix",
-        "analyse": "phpstan analyse src",
+        "fix-dry": "php-cs-fixer fix --dry-run --diff",
+        "analyse": "phpstan analyse --no-progress --memory-limit=256M",
         "check": [
             "@analyse",
+            "@fix-dry",
             "@test"
+        ],
+        "ci": [
+            "@check"
         ]
     },
     "config": {

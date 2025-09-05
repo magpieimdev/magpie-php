@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        php: [8.1, 8.2, 8.3]
+        php: [8.1, 8.2, 8.3, 8.4]
         stability: [prefer-lowest, prefer-stable]
         
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - ${{ matrix.os }}
@@ -68,7 +68,7 @@ jobs:
       run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
     - name: Execute static analysis
-      run: vendor/bin/phpstan analyse --no-progress
+      run: vendor/bin/phpstan analyse --no-progress --memory-limit=256M
 
   code-style:
     runs-on: ubuntu-latest
@@ -89,4 +89,4 @@ jobs:
       run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
     - name: Check code style
-      run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+      run: vendor/bin/php-cs-fixer fix --dry-run --diff
