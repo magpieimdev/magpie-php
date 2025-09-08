@@ -17,7 +17,7 @@ class OrganizationResource extends BaseResource
 {
     public function __construct(Client $client)
     {
-        parent::__construct($client, '/me');
+        parent::__construct($client, 'me');
     }
 
     /**
@@ -35,7 +35,7 @@ class OrganizationResource extends BaseResource
      */
     public function me(array $options = []): array
     {
-        return $this->client->get('me', null, $options);
+        return $this->client->get($this->basePath, null, $options);
     }
 
     /**

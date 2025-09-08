@@ -98,29 +98,33 @@ class Client
      */
     private function createHttpClient(): GuzzleClient
     {
+        // Create a clean handler stack to avoid any global middleware interference
         $stack = HandlerStack::create();
-
-        // Add retry middleware
-        $stack->push($this->createRetryMiddleware());
-
-        // Add request/response logging middleware
+        
+        // Add retry middleware if needed
+        if ($this->config->maxRetries > 0) {
+            $stack->push($this->createRetryMiddleware());
+        }
+        
+        // Add logging middleware if debug is enabled
         if ($this->config->debug) {
             $stack->push($this->createLoggingMiddleware());
         }
-
+        
         return new GuzzleClient([
-            'base_uri' => $this->config->getApiUrl(),
             'handler' => $stack,
+            'base_uri' => $this->config->getApiUrl(),
             'timeout' => $this->config->timeout,
             'connect_timeout' => $this->config->connectTimeout,
             'verify' => $this->config->verifySsl,
+            'debug' => $this->config->debug,  // Enable debug output when debug config is true
+            'auth' => [$this->secretKey, ''],  // Use Guzzle's built-in HTTP Basic Auth
             'headers' => array_merge([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'User-Agent' => $this->config->userAgent,
                 'X-API-Version' => $this->config->apiVersion,
             ], $this->config->defaultHeaders),
-            'auth' => [$this->secretKey, ''],
         ]);
     }
 
