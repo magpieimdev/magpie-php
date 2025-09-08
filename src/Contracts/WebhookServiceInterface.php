@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Magpie\Contracts;
+
+use Magpie\DTOs\Responses\WebhookEvent;
+
+interface WebhookServiceInterface
+{
+    public function constructEvent(
+        string $payload,
+        string $signature,
+        string $secret
+    ): WebhookEvent;
+}
