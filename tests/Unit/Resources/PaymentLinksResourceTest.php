@@ -115,7 +115,7 @@ class PaymentLinksResourceTest extends TestCase
             'metadata' => ['campaign' => 'holiday-sale'],
         ];
 
-        $client->shouldReceive('patch')
+        $client->shouldReceive('put')
             ->once()
             ->with("links/{$linkId}", $params, [])
             ->andReturn($expectedResponse);
@@ -323,7 +323,7 @@ class PaymentLinksResourceTest extends TestCase
             'active' => true,  // Unchanged from previous state
         ];
 
-        $client->shouldReceive('patch')
+        $client->shouldReceive('put')
             ->once()
             ->with("links/{$linkId}", $params, [])
             ->andReturn($expectedResponse);

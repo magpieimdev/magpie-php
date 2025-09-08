@@ -208,6 +208,6 @@ class CheckoutSessionsResourceTest extends TestCase
         $baseUrlProperty = $reflectionClass->getProperty('customBaseUrl');
         $baseUrlProperty->setAccessible(true);
 
-        $this->assertSame('https://new.pay.magpie.im', $baseUrlProperty->getValue($resource));
+        $this->assertSame('https://api.pay.magpie.im', $baseUrlProperty->getValue($resource));
     }
 }

@@ -35,10 +35,22 @@ class CustomersResourceTest extends TestCase
             ],
         ];
 
-        $expectedResponse = [
+        // Expected payload after transformation (name moved to metadata)
+        $expectedPayload = [
+            'email' => 'john@example.com',
+            'phone' => '+639151234567',
+            'description' => 'Premium customer',
+            'metadata' => [
+                'user_id' => '12345',
+                'plan' => 'premium',
+                'name' => 'John Doe',
+            ],
+        ];
+
+        // API response has name in metadata
+        $apiResponse = [
             'id' => 'cus_test_123',
             'object' => 'customer',
-            'name' => 'John Doe',
             'email' => 'john@example.com',
             'phone' => '+639151234567',
             'description' => 'Premium customer',
@@ -46,22 +58,26 @@ class CustomersResourceTest extends TestCase
             'metadata' => [
                 'user_id' => '12345',
                 'plan' => 'premium',
+                'name' => 'John Doe',
             ],
         ];
 
         $client->shouldReceive('post')
             ->once()
-            ->with('customers', $params, [])
-            ->andReturn($expectedResponse);
+            ->with('customers', $expectedPayload, [])
+            ->andReturn($apiResponse);
 
         $result = $resource->create($params);
 
         $this->assertSame('cus_test_123', $result['id']);
         $this->assertSame('customer', $result['object']);
-        $this->assertSame('John Doe', $result['name']);
+        $this->assertSame('John Doe', $result['name']); // Should be extracted from metadata
         $this->assertSame('john@example.com', $result['email']);
         $this->assertSame('+639151234567', $result['phone']);
         $this->assertSame('Premium customer', $result['description']);
+        $this->assertSame('12345', $result['metadata']['user_id']);
+        $this->assertSame('premium', $result['metadata']['plan']);
+        $this->assertSame('John Doe', $result['metadata']['name']); // Should still be in metadata
     }
 
     public function testRetrieve(): void
@@ -111,22 +127,32 @@ class CustomersResourceTest extends TestCase
             ],
         ];
 
-        $expectedResponse = [
+        // Expected payload after transformation (name moved to metadata)
+        $expectedPayload = [
+            'phone' => '+639157654321',
+            'metadata' => [
+                'plan' => 'enterprise',
+                'name' => 'John Smith',
+            ],
+        ];
+
+        // API response has name in metadata
+        $apiResponse = [
             'id' => $customerId,
             'object' => 'customer',
-            'name' => 'John Smith',
             'email' => 'john@example.com',
             'phone' => '+639157654321',
             'metadata' => [
                 'user_id' => '12345',
                 'plan' => 'enterprise',
+                'name' => 'John Smith',
             ],
         ];
 
-        $client->shouldReceive('patch')
+        $client->shouldReceive('put')
             ->once()
-            ->with("customers/{$customerId}", $params, [])
-            ->andReturn($expectedResponse);
+            ->with("customers/{$customerId}", $expectedPayload, [])
+            ->andReturn($apiResponse);
 
         $result = $resource->update($customerId, $params);
 
@@ -142,18 +168,22 @@ class CustomersResourceTest extends TestCase
         $resource = new CustomersResource($client);
 
         $email = 'john@example.com';
-        $expectedResponse = [
+        
+        // API response has name in metadata
+        $apiResponse = [
             'id' => 'cus_test_123',
             'object' => 'customer',
-            'name' => 'John Doe',
             'email' => $email,
             'phone' => '+639151234567',
+            'metadata' => [
+                'name' => 'John Doe',
+            ],
         ];
 
         $client->shouldReceive('request')
             ->once()
-            ->with('GET', 'customers/by_email', ['email' => $email], [])
-            ->andReturn($expectedResponse);
+            ->with('GET', 'customers/by_email/' . $email, null, [])
+            ->andReturn($apiResponse);
 
         $result = $resource->retrieveByEmail($email);
 
@@ -264,17 +294,29 @@ class CustomersResourceTest extends TestCase
             'email' => 'jane@example.com',
         ];
 
+        // Expected payload after transformation (name moved to metadata)
+        $expectedPayload = [
+            'email' => 'jane@example.com',
+            'metadata' => [
+                'name' => 'Jane Doe',
+            ],
+        ];
+
         $options = ['idempotency_key' => 'customer_create_123'];
 
-        $expectedResponse = [
+        // API response has name in metadata
+        $apiResponse = [
             'id' => 'cus_test_789',
             'object' => 'customer',
+            'metadata' => [
+                'name' => 'Jane Doe',
+            ],
         ];
 
         $client->shouldReceive('post')
             ->once()
-            ->with('customers', $params, $options)
-            ->andReturn($expectedResponse);
+            ->with('customers', $expectedPayload, $options)
+            ->andReturn($apiResponse);
 
         $result = $resource->create($params, $options);
 
@@ -290,10 +332,20 @@ class CustomersResourceTest extends TestCase
         $params = ['name' => 'Updated Name'];
         $options = ['expand' => ['sources']];
 
-        $expectedResponse = [
+        // Expected payload after transformation (name moved to metadata)
+        $expectedPayload = [
+            'metadata' => [
+                'name' => 'Updated Name',
+            ],
+        ];
+
+        // API response has name in metadata
+        $apiResponse = [
             'id' => $customerId,
             'object' => 'customer',
-            'name' => 'Updated Name',
+            'metadata' => [
+                'name' => 'Updated Name',
+            ],
             'sources' => [
                 [
                     'id' => 'src_123',
@@ -302,10 +354,10 @@ class CustomersResourceTest extends TestCase
             ],
         ];
 
-        $client->shouldReceive('patch')
+        $client->shouldReceive('put')
             ->once()
-            ->with("customers/{$customerId}", $params, $options)
-            ->andReturn($expectedResponse);
+            ->with("customers/{$customerId}", $expectedPayload, $options)
+            ->andReturn($apiResponse);
 
         $result = $resource->update($customerId, $params, $options);
 
@@ -341,18 +393,22 @@ class CustomersResourceTest extends TestCase
         $email = 'test@example.com';
         $options = ['expand' => ['sources']];
 
-        $expectedResponse = [
+        // API response
+        $apiResponse = [
             'id' => 'cus_test_123',
             'email' => $email,
             'sources' => [
                 ['id' => 'src_123'],
             ],
+            'metadata' => [
+                'name' => 'Test User',
+            ],
         ];
 
         $client->shouldReceive('request')
             ->once()
-            ->with('GET', 'customers/email', ['email' => $email], $options)
-            ->andReturn($expectedResponse);
+            ->with('GET', 'customers/by_email/' . $email, null, $options)
+            ->andReturn($apiResponse);
 
         $result = $resource->retrieveByEmail($email, $options);
 
