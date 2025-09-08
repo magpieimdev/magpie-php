@@ -28,7 +28,7 @@ class SourcesResource extends BaseResource
 
     public function __construct(Client $client)
     {
-        parent::__construct($client, '/sources');
+        parent::__construct($client, 'sources');
     }
 
     /**

@@ -6,6 +6,8 @@ namespace Magpie\Resources;
 
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
+use Magpie\DTOs\Requests\Customers\CreateCustomerRequest;
+use Magpie\DTOs\Requests\Customers\UpdateCustomerRequest;
 
 /**
  * Resource class for managing customers.
@@ -24,8 +26,8 @@ class CustomersResource extends BaseResource
     /**
      * Create a new customer.
      *
-     * @param array $params  Customer creation parameters
-     * @param array $options Additional request options
+     * @param CreateCustomerRequest|array $request  Customer creation parameters or DTO
+     * @param array                       $options  Additional request options
      *
      * @return array Created customer data
      *
@@ -33,17 +35,35 @@ class CustomersResource extends BaseResource
      *
      * @example
      * ```php
+     * // Using array (backward compatible)
      * $customer = $magpie->customers->create([
      *     'name' => 'John Doe',
      *     'email' => 'john@example.com',
-     *     'phone' => '+639151234567',
+     *     'mobile_number' => '+639151234567',
      *     'description' => 'Premium customer'
      * ]);
+     *
+     * // Using DTO (type-safe)
+     * $request = new CreateCustomerRequest(
+     *     email: 'john@example.com',
+     *     description: 'Premium customer',
+     *     name: 'John Doe',
+     *     mobile_number: '+639151234567'
+     * );
+     * $customer = $magpie->customers->create($request);
      * ```
      */
-    public function create(array $params, array $options = []): array
+    public function create(CreateCustomerRequest|array $request, array $options = []): array
     {
-        return parent::create($params, $options);
+        if (is_array($request)) {
+            $transformedRequest = $this->transformCustomerPayload($request);
+            $customer = parent::create($transformedRequest, $options);
+            return $this->transformCustomerResponse($customer);
+        }
+        
+        $transformedRequest = $this->transformCustomerPayload($request->toArray());
+        $customer = parent::create($transformedRequest, $options);
+        return $this->transformCustomerResponse($customer);
     }
 
     /**
@@ -58,23 +78,32 @@ class CustomersResource extends BaseResource
      */
     public function retrieve(string $id, array $options = []): array
     {
-        return parent::retrieve($id, $options);
+        $customer = parent::retrieve($id, $options);
+        return $this->transformCustomerResponse($customer);
     }
 
     /**
      * Update a customer.
      *
-     * @param string $id      Customer ID
-     * @param array  $params  Update parameters
-     * @param array  $options Additional request options
+     * @param string                      $id      Customer ID
+     * @param UpdateCustomerRequest|array $request Update parameters or DTO
+     * @param array                       $options Additional request options
      *
      * @return array Updated customer data
      *
      * @throws MagpieException
      */
-    public function update(string $id, array $params, array $options = []): array
+    public function update(string $id, UpdateCustomerRequest|array $request, array $options = []): array
     {
-        return parent::update($id, $params, $options);
+        if (is_array($request)) {
+            $transformedRequest = $this->transformCustomerPayload($request);
+            $customer = parent::update($id, $transformedRequest, $options);
+            return $this->transformCustomerResponse($customer);
+        }
+        
+        $transformedRequest = $this->transformCustomerPayload($request->toArray());
+        $customer = parent::update($id, $transformedRequest, $options);
+        return $this->transformCustomerResponse($customer);
     }
 
     /**
@@ -94,7 +123,8 @@ class CustomersResource extends BaseResource
      */
     public function retrieveByEmail(string $email, array $options = []): array
     {
-        return $this->customAction('GET', $this->buildPath().'/by_email/'.$email, null, $options);
+        $customer = $this->customAction('GET', $this->buildPath().'/by_email/'.$email, null, $options);
+        return $this->transformCustomerResponse($customer);
     }
 
     /**
@@ -118,7 +148,8 @@ class CustomersResource extends BaseResource
      */
     public function attachSource(string $id, string $source, array $options = []): array
     {
-        return $this->customResourceAction('POST', $id, 'sources', ['source' => $source], $options);
+        $customer = $this->customResourceAction('POST', $id, 'sources', ['source' => $source], $options);
+        return $this->transformCustomerResponse($customer);
     }
 
     /**
@@ -142,6 +173,45 @@ class CustomersResource extends BaseResource
      */
     public function detachSource(string $id, string $source, array $options = []): array
     {
-        return $this->customAction('DELETE', $this->buildPath($id, "sources/{$source}"), null, $options);
+        $customer = $this->customAction('DELETE', $this->buildPath($id, "sources/{$source}"), null, $options);
+        return $this->transformCustomerResponse($customer);
+    }
+
+    /**
+     * Transform customer payload to move name to metadata.
+     *
+     * @param array $payload The original payload
+     * @return array The transformed payload
+     */
+    private function transformCustomerPayload(array $payload): array
+    {
+        if (isset($payload['name'])) {
+            // Initialize metadata if not present
+            $payload['metadata'] = $payload['metadata'] ?? [];
+            
+            // Set name in metadata (this will update existing or create new)
+            $payload['metadata']['name'] = $payload['name'];
+            
+            // Remove name from top level
+            unset($payload['name']);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Transform customer response to extract name from metadata.
+     *
+     * @param array $response The API response
+     * @return array The transformed response
+     */
+    private function transformCustomerResponse(array $response): array
+    {
+        if (isset($response['metadata']['name'])) {
+            // Extract name from metadata to top level
+            $response['name'] = $response['metadata']['name'];
+        }
+
+        return $response;
     }
 }

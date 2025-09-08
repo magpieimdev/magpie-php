@@ -6,6 +6,9 @@ namespace Magpie\Resources;
 
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
+use Magpie\DTOs\Requests\Charges\CreateChargeRequest;
+use Magpie\DTOs\Requests\Charges\CaptureChargeRequest;
+use Magpie\DTOs\Requests\Charges\RefundChargeRequest;
 
 /**
  * Resource class for managing charges and payments.
@@ -23,7 +26,7 @@ class ChargesResource extends BaseResource
      */
     public function __construct(Client $client)
     {
-        parent::__construct($client, '/charges');
+        parent::__construct($client, 'charges');
     }
 
     /**
@@ -32,8 +35,8 @@ class ChargesResource extends BaseResource
      * A charge represents a request to transfer money from a customer to your account.
      * You can create charges directly or authorize them first for later capture.
      *
-     * @param array $params  The parameters for creating the charge
-     * @param array $options Additional request options (e.g., idempotency key)
+     * @param CreateChargeRequest|array $request The parameters for creating the charge or DTO
+     * @param array                     $options Additional request options (e.g., idempotency key)
      *
      * @return array The created charge data
      *
@@ -41,18 +44,34 @@ class ChargesResource extends BaseResource
      *
      * @example
      * ```php
+     * // Using array (backward compatible)
      * $charge = $magpie->charges->create([
      *     'amount' => 20000, // 200.00 in centavos
      *     'currency' => 'php',
      *     'source' => 'src_1234567890',
      *     'description' => 'Payment for order #1001',
+     *     'statement_descriptor' => 'STORE',
      *     'capture' => true // Capture immediately
      * ]);
+     *
+     * // Using DTO (type-safe)
+     * $request = new CreateChargeRequest(
+     *     amount: 20000,
+     *     currency: 'php',
+     *     source: 'src_1234567890',
+     *     description: 'Payment for order #1001',
+     *     statement_descriptor: 'STORE'
+     * );
+     * $charge = $magpie->charges->create($request);
      * ```
      */
-    public function create(array $params, array $options = []): array
+    public function create(CreateChargeRequest|array $request, array $options = []): array
     {
-        return parent::create($params, $options);
+        if (is_array($request)) {
+            return parent::create($request, $options);
+        }
+        
+        return parent::create($request->toArray(), $options);
     }
 
     /**
@@ -81,9 +100,9 @@ class ChargesResource extends BaseResource
      * When you create a charge with `capture: false`, it will be authorized but not
      * captured. Use this method to capture the authorized amount (or a portion of it).
      *
-     * @param string $id      The unique identifier of the charge to capture
-     * @param array  $params  The capture parameters (amount, etc.)
-     * @param array  $options Additional request options
+     * @param string                      $id      The unique identifier of the charge to capture
+     * @param CaptureChargeRequest|array  $request The capture parameters (amount, etc.) or DTO
+     * @param array                       $options Additional request options
      *
      * @return array The updated charge data
      *
@@ -91,19 +110,19 @@ class ChargesResource extends BaseResource
      *
      * @example
      * ```php
-     * // Capture the full amount
+     * // Using array (backward compatible)
      * $captured = $magpie->charges->capture('ch_1234567890', [
      *     'amount' => 20000
      * ]);
      *
-     * // Or capture a partial amount
-     * $partialCapture = $magpie->charges->capture('ch_1234567890', [
-     *     'amount' => 15000 // Capture 150.00 instead of 200.00
-     * ]);
+     * // Using DTO (type-safe)
+     * $request = new CaptureChargeRequest(amount: 15000);
+     * $captured = $magpie->charges->capture('ch_1234567890', $request);
      * ```
      */
-    public function capture(string $id, array $params = [], array $options = []): array
+    public function capture(string $id, CaptureChargeRequest|array $request, array $options = []): array
     {
+        $params = is_array($request) ? $request : $request->toArray();
         return $this->customResourceAction('POST', $id, 'capture', $params, $options);
     }
 
@@ -163,9 +182,9 @@ class ChargesResource extends BaseResource
      * Refunds can be created for the full charge amount or a partial amount.
      * The refund will be processed back to the original payment method.
      *
-     * @param string $id      The unique identifier of the charge to refund
-     * @param array  $params  The refund parameters (amount, reason, etc.)
-     * @param array  $options Additional request options
+     * @param string                     $id      The unique identifier of the charge to refund
+     * @param RefundChargeRequest|array  $request The refund parameters (amount, reason, etc.) or DTO
+     * @param array                      $options Additional request options
      *
      * @return array The updated charge data with refund information
      *
@@ -173,21 +192,23 @@ class ChargesResource extends BaseResource
      *
      * @example
      * ```php
-     * // Full refund
+     * // Using array (backward compatible)
      * $refunded = $magpie->charges->refund('ch_1234567890', [
      *     'amount' => 20000,
      *     'reason' => 'requested_by_customer'
      * ]);
      *
-     * // Partial refund
-     * $partialRefund = $magpie->charges->refund('ch_1234567890', [
-     *     'amount' => 10000, // Refund 100.00 out of 200.00 charge
-     *     'reason' => 'duplicate'
-     * ]);
+     * // Using DTO (type-safe)
+     * $request = new RefundChargeRequest(
+     *     amount: 10000,
+     *     reason: 'duplicate'
+     * );
+     * $refunded = $magpie->charges->refund('ch_1234567890', $request);
      * ```
      */
-    public function refund(string $id, array $params = [], array $options = []): array
+    public function refund(string $id, RefundChargeRequest|array $request, array $options = []): array
     {
+        $params = is_array($request) ? $request : $request->toArray();
         return $this->customResourceAction('POST', $id, 'refund', $params, $options);
     }
 }

@@ -6,6 +6,8 @@ namespace Magpie\Resources;
 
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
+use Magpie\DTOs\Requests\PaymentLinks\CreatePaymentLinkRequest;
+use Magpie\DTOs\Requests\PaymentLinks\UpdatePaymentLinkRequest;
 
 /**
  * Resource class for managing payment links.
@@ -23,7 +25,7 @@ class PaymentLinksResource extends BaseResource
      */
     public function __construct(Client $client)
     {
-        parent::__construct($client, '/links', 'https://buy.magpie.im/api/v1');
+        parent::__construct($client, 'links', 'https://buy.magpie.im/api/v1');
     }
 
     /**
@@ -32,8 +34,8 @@ class PaymentLinksResource extends BaseResource
      * Payment links provide a hosted payment page accessible via a shareable URL.
      * No coding required - perfect for social media, email campaigns, or instant invoicing.
      *
-     * @param array $params  The parameters for creating the payment link
-     * @param array $options Additional request options
+     * @param CreatePaymentLinkRequest|array $request  Payment link creation parameters or DTO
+     * @param array                          $options  Additional request options
      *
      * @return array Created payment link data
      *
@@ -41,6 +43,7 @@ class PaymentLinksResource extends BaseResource
      *
      * @example
      * ```php
+     * // Using array (backward compatible)
      * $paymentLink = $magpie->paymentLinks->create([
      *     'internal_name' => 'Website Design Service',
      *     'allow_adjustable_quantity' => true,
@@ -53,11 +56,31 @@ class PaymentLinksResource extends BaseResource
      *         ]
      *     ]
      * ]);
+     *
+     * // Using DTO (type-safe)
+     * $request = new CreatePaymentLinkRequest(
+     *     allow_adjustable_quantity: true,
+     *     currency: 'PHP',
+     *     internal_name: 'Website Design Service',
+     *     line_items: [
+     *         [
+     *             'amount' => 100000,
+     *             'description' => 'Website Design Service',
+     *             'quantity' => 1
+     *         ]
+     *     ],
+     *     payment_method_types: ['card']
+     * );
+     * $paymentLink = $magpie->paymentLinks->create($request);
      * ```
      */
-    public function create(array $params, array $options = []): array
+    public function create(CreatePaymentLinkRequest|array $request, array $options = []): array
     {
-        return parent::create($params, $options);
+        if (is_array($request)) {
+            return parent::create($request, $options);
+        }
+        
+        return parent::create($request->toArray(), $options);
     }
 
     /**
@@ -78,17 +101,21 @@ class PaymentLinksResource extends BaseResource
     /**
      * Update an existing payment link.
      *
-     * @param string $id      The unique identifier of the payment link to update
-     * @param array  $params  The update parameters
-     * @param array  $options Additional request options
+     * @param string                         $id      The unique identifier of the payment link to update
+     * @param UpdatePaymentLinkRequest|array $request The update parameters or DTO
+     * @param array                          $options Additional request options
      *
      * @return array Updated payment link data
      *
      * @throws MagpieException
      */
-    public function update(string $id, array $params, array $options = []): array
+    public function update(string $id, UpdatePaymentLinkRequest|array $request, array $options = []): array
     {
-        return parent::update($id, $params, $options);
+        if (is_array($request)) {
+            return parent::update($id, $request, $options);
+        }
+        
+        return parent::update($id, $request->toArray(), $options);
     }
 
     /**

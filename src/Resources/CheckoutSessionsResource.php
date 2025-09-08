@@ -6,6 +6,8 @@ namespace Magpie\Resources;
 
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
+use Magpie\DTOs\Requests\Checkout\CreateCheckoutSessionRequest;
+use Magpie\DTOs\Requests\Checkout\CaptureSessionRequest;
 
 /**
  * Resource class for managing checkout sessions.
@@ -24,7 +26,7 @@ class CheckoutSessionsResource extends BaseResource
     public function __construct(Client $client)
     {
         // Use different base URL for checkout sessions
-        parent::__construct($client, '/', 'https://new.pay.magpie.im');
+        parent::__construct($client, '', 'https://api.pay.magpie.im');
     }
 
     /**
@@ -33,8 +35,8 @@ class CheckoutSessionsResource extends BaseResource
      * Creates a hosted payment page where customers can securely complete their
      * purchase. The session includes line items, payment options, and redirect URLs.
      *
-     * @param array $params  The parameters for creating the checkout session
-     * @param array $options Additional request options
+     * @param CreateCheckoutSessionRequest|array $request Checkout session creation parameters or DTO
+     * @param array                              $options Additional request options
      *
      * @return array Created checkout session data
      *
@@ -42,6 +44,7 @@ class CheckoutSessionsResource extends BaseResource
      *
      * @example
      * ```php
+     * // Using array (backward compatible)
      * $session = $magpie->checkout->sessions->create([
      *     'line_items' => [
      *         [
@@ -55,13 +58,32 @@ class CheckoutSessionsResource extends BaseResource
      *     'customer_email' => 'customer@example.com'
      * ]);
      *
+     * // Using DTO (type-safe)
+     * $request = new CreateCheckoutSessionRequest(
+     *     line_items: [
+     *         [
+     *             'amount' => 25000,
+     *             'description' => 'Pro Plan Monthly',
+     *             'quantity' => 1
+     *         ]
+     *     ],
+     *     success_url: 'https://example.com/success',
+     *     cancel_url: 'https://example.com/cancel',
+     *     customer_email: 'customer@example.com'
+     * );
+     * $session = $magpie->checkout->sessions->create($request);
+     *
      * // Redirect customer to the checkout page
      * header('Location: ' . $session['url']);
      * ```
      */
-    public function create(array $params, array $options = []): array
+    public function create(CreateCheckoutSessionRequest|array $request, array $options = []): array
     {
-        return parent::create($params, $options);
+        if (is_array($request)) {
+            return parent::create($request, $options);
+        }
+        
+        return parent::create($request->toArray(), $options);
     }
 
     /**
@@ -85,17 +107,21 @@ class CheckoutSessionsResource extends BaseResource
      * For sessions created with authorization-only payment methods,
      * this captures the authorized amount (or a portion of it).
      *
-     * @param string $id      The unique identifier of the checkout session
-     * @param array  $params  The capture parameters
-     * @param array  $options Additional request options
+     * @param string                     $id      The unique identifier of the checkout session
+     * @param CaptureSessionRequest|array $request The capture parameters or DTO
+     * @param array                      $options Additional request options
      *
      * @return array Updated checkout session data
      *
      * @throws MagpieException
      */
-    public function capture(string $id, array $params, array $options = []): array
+    public function capture(string $id, CaptureSessionRequest|array $request, array $options = []): array
     {
-        return $this->customResourceAction('POST', $id, 'capture', $params, $options);
+        if (is_array($request)) {
+            return $this->customResourceAction('POST', $id, 'capture', $request, $options);
+        }
+        
+        return $this->customResourceAction('POST', $id, 'capture', $request->toArray(), $options);
     }
 
     /**
