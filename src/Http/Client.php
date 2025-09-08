@@ -192,12 +192,15 @@ class Client
                 'headers' => $this->sanitizeHeaders($request->getHeaders()),
                 'body' => (string) $request->getBody(),
             ]);
-        }, function (RequestInterface $request, array $options, ResponseInterface $response) {
-            $this->logger->debug('HTTP Response', [
-                'status' => $response->getStatusCode(),
-                'headers' => $response->getHeaders(),
-                'body' => (string) $response->getBody(),
-            ]);
+        }, function (RequestInterface $request, array $options, $response) {
+            // Only log if we have an actual response object
+            if ($response instanceof ResponseInterface) {
+                $this->logger->debug('HTTP Response', [
+                    'status' => $response->getStatusCode(),
+                    'headers' => $response->getHeaders(),
+                    'body' => (string) $response->getBody(),
+                ]);
+            }
         });
     }
 
@@ -425,10 +428,14 @@ class Client
     public function ping(): bool
     {
         try {
-            $this->get('/ping');
-
-            return true;
-        } catch (MagpieException $e) {
+            // Ping endpoint is at base URL without version and returns plain text
+            $response = $this->httpClient->request('GET', 'ping', [
+                'base_uri' => rtrim($this->config->baseUrl, '/') . '/',
+            ]);
+            
+            $body = (string) $response->getBody();
+            return $body === 'healthy';
+        } catch (\Exception $e) {
             return false;
         }
     }

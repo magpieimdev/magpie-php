@@ -116,7 +116,7 @@ class MagpieException extends \Exception
         $code = $error['code'] ?? "http_{$statusCode}";
         $details = $error['details'] ?? [];
 
-        return new self(
+        return new static(
             $message,
             $type,
             $code,
