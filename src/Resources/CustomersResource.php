@@ -18,7 +18,7 @@ class CustomersResource extends BaseResource
 {
     public function __construct(Client $client)
     {
-        parent::__construct($client, '/customers');
+        parent::__construct($client, 'customers');
     }
 
     /**
@@ -94,7 +94,7 @@ class CustomersResource extends BaseResource
      */
     public function retrieveByEmail(string $email, array $options = []): array
     {
-        return $this->customAction('GET', $this->buildPath().'/email', ['email' => $email], $options);
+        return $this->customAction('GET', $this->buildPath().'/by_email/'.$email, null, $options);
     }
 
     /**

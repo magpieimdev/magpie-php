@@ -45,5 +45,71 @@ class ValidationException extends MagpieException
     {
         return ! empty($this->errors[$field]);
     }
+
+    /**
+     * Create a ValidationException from an HTTP response.
+     *
+     * @param ResponseInterface $response The HTTP response
+     */
+    public static function fromResponse(\Psr\Http\Message\ResponseInterface $response): self
+    {
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody()->getContents();
+        $headers = [];
+
+        // Convert headers to array
+        foreach ($response->getHeaders() as $name => $values) {
+            $headers[$name] = implode(', ', $values);
+        }
+
+        $requestId = $headers['request-id'] ?? $headers['Request-ID'] ?? null;
+
+        try {
+            $data = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $data = ['error' => ['message' => 'Invalid JSON response']];
+        }
+
+        $error = $data['error'] ?? $data;
+        $message = $error['message'] ?? $data['message'] ?? "HTTP {$statusCode} Error";
+        $type = $error['type'] ?? static::mapStatusToErrorType($statusCode);
+        $code = $error['code'] ?? "http_{$statusCode}";
+        $details = $error['details'] ?? [];
+        
+        // Extract validation errors - they might be in 'errors', 'details', or embedded in message
+        $errors = [];
+        if (isset($error['errors']) && is_array($error['errors'])) {
+            $errors = $error['errors'];
+        } elseif (is_array($details)) {
+            $errors = $details;
+        }
+
+        return new static(
+            $message,
+            $errors,
+            $code,
+            $statusCode,
+            $requestId,
+            $details,
+            $response,
+            $headers
+        );
+    }
+
+    /**
+     * Map HTTP status codes to error types.
+     */
+    protected static function mapStatusToErrorType(int $statusCode): string
+    {
+        return match (true) {
+            $statusCode >= 500 => 'api_error',
+            429 === $statusCode => 'rate_limit_error',
+            401 === $statusCode => 'authentication_error',
+            403 === $statusCode => 'permission_error',
+            404 === $statusCode => 'not_found_error',
+            $statusCode >= 400 => 'invalid_request_error',
+            default => 'api_error'
+        };
+    }
 }
 

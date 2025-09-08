@@ -110,7 +110,7 @@ abstract class BaseResource
      */
     protected function update(string $id, array $data, array $options = []): array
     {
-        return $this->client->patch($this->buildPath($id), $data, $options);
+        return $this->client->put($this->buildPath($id), $data, $options);
     }
 
     /**

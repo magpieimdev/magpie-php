@@ -152,7 +152,7 @@ class CustomersResourceTest extends TestCase
 
         $client->shouldReceive('request')
             ->once()
-            ->with('GET', 'customers/email', ['email' => $email], [])
+            ->with('GET', 'customers/by_email', ['email' => $email], [])
             ->andReturn($expectedResponse);
 
         $result = $resource->retrieveByEmail($email);
