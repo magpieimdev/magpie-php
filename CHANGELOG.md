@@ -9,23 +9,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 🎯 **Hybrid API Design**: Support for both array-based and DTO-based usage
-- 🛡️ **Type-Safe Value Objects**: Complete Node.js SDK alignment with proper typing
-- 🔄 **Customer Name Transformation**: Automatic handling of name ↔ metadata.name
-- ⬅️ **Backward Compatibility**: Existing array-based code continues unchanged
-- 📦 **Comprehensive Value Objects**: LineItem, BrandingOptions, Address hierarchies, Source card/bank details
-- 🏗️ **Complex Nested Types**: ChargeFailure, SourceOwner, CheckoutSession addresses, and more
-- 🎨 **Smart Serialization**: Automatic conversion between arrays and typed objects
+- 🎯 Hybrid API design: use either plain arrays or typed DTOs across the SDK
+- 🧩 ArrayAccess on responses: BaseResponse implements ArrayAccess for ergonomic array-like access
+- 📦 **Comprehensive value objects**: 19+ new value objects including:
+  - Payment structure: `LineItem`, `PaymentLinkItem`, `Refund`
+  - Address handling: `Address`, `Billing`, `Shipping`, `CheckoutSessionAddress`, `ShippingAddressCollection`
+  - Source details: `SourceCard`, `SourceBankAccount`, `SourceOwner`, `SourceRedirect`
+  - Branding & UI: `BrandingOptions`, `CheckoutSessionMerchant`
+  - Payment flow: `ChargeAction`, `ChargeFailure`, `ChargeProviderResponse`, `PaymentRequestDelivered`
+- 🏗️ **Complex nested type support**: Automatic handling of deeply nested object structures with proper PHP typing
+- 🎨 Smart serialization: automatic conversion between arrays and typed objects
+- 🔢 Enhanced enums: Additional enum cases added (e.g., `ChargeStatus` now includes `VOIDED`, `REFUNDED`)
 
-### Enhanced
+### Changed
 
-- All service interfaces now support `Request|array` parameters
-- All resource classes handle both array and DTO inputs seamlessly
-- Customer resource includes smart name field transformation
-- Complete DTOs with proper value objects instead of generic arrays
-- Enhanced BaseRequest/BaseResponse with intelligent toArray() methods
-- Full Node.js TypeScript interface parity in PHP
-- README updated with concise hybrid API examples
+- Contracts now accept `Request|array` parameters for all service interfaces
+- Resources return and accept mixed types (arrays or DTOs) with improved type handling
+- Customer resource: smart transformation between `name` and `metadata.name`
+- DTOs enriched with stricter typing and value objects (replacing generic arrays)
+- BaseRequest/BaseResponse improved with more robust (de)serialization helpers
+
+### Tests
+
+- **Unit tests enhanced**: Comprehensive coverage for hybrid array/DTO flows and type validations across all resources
+- **Integration tests added**: 
+  - `AllDtosHybridTest`: Validates ArrayAccess compatibility for all DTO response types (Source, Customer, Charge, CheckoutSession, Organization, PaymentLink, PaymentRequest, WebhookEvent)
+  - `HybridApiTest`: Live API validation testing core resource operations with both array and DTO approaches
+  - Ensures backward compatibility while validating new hybrid functionality
+
+### Technical Implementation
+
+- **ArrayAccess Interface**: `BaseResponse` now implements `ArrayAccess`, allowing `$response['key']` syntax alongside `$response->key`
+- **Mixed Return Types**: Service contracts and resources updated to support `mixed` return types for flexibility
+- **Type-Safe Serialization**: Enhanced `fromArray()` methods with robust type conversion and validation
+- **Nested Object Mapping**: Automatic conversion of nested arrays to appropriate value objects
+- **Memory Efficient**: No duplication of data between array and object representations
+
+### Compatibility
+
+- **Fully Backward Compatible**: Existing array-based code continues to work without any changes
+- **Zero Breaking Changes**: All enhancements are additive and opt-in via DTO usage
+- **Progressive Enhancement**: Developers can gradually adopt DTOs at their own pace
+
+### Documentation
+
+- README updated with hybrid API examples and DTO adoption guidance
+- Comprehensive value object documentation and usage examples
 
 ## [1.0.0] - 2025-09-05
 
@@ -207,22 +236,3 @@ $customer = Magpie::customers()->create([
 - Minimal memory footprint
 - Optimized for high-throughput applications
 
----
-
-## Future Releases
-
-### Planned for v1.1.0
-
-- Integration test suite with live API
-- Enhanced Laravel features (Artisan commands, migrations)
-- Batch operations support
-- Advanced caching mechanisms
-- Performance monitoring tools
-
-### Planned for v1.2.0
-
-- Multi-tenancy support
-- Async/parallel request capabilities
-- Enhanced webhook management
-- Advanced reporting features
-- Additional payment method support
