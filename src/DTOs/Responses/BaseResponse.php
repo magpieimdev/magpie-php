@@ -33,4 +33,49 @@ abstract class BaseResponse
         
         return new static(...$args);
     }
+
+    public function toArray(): array
+    {
+        $reflection = new \ReflectionClass($this);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+        
+        $data = [];
+        foreach ($properties as $property) {
+            $value = $property->getValue($this);
+            
+            if ($value !== null) {
+                $key = $this->convertPropertyName($property->getName());
+                $data[$key] = $this->convertValue($value);
+            }
+        }
+        
+        return $data;
+    }
+
+    protected function convertPropertyName(string $propertyName): string
+    {
+        return strtolower(preg_replace('/([A-Z])/', '_$1', lcfirst($propertyName)));
+    }
+
+    protected function convertValue(mixed $value): mixed
+    {
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+        
+        if ($value instanceof \DateTime) {
+            return $value->getTimestamp();
+        }
+        
+        // Handle value objects with toArray() method
+        if (is_object($value) && method_exists($value, 'toArray')) {
+            return $value->toArray();
+        }
+        
+        if (is_array($value)) {
+            return array_map(fn($item) => $this->convertValue($item), $value);
+        }
+        
+        return $value;
+    }
 }

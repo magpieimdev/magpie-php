@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Magpie\DTOs\Responses;
 
+use Magpie\DTOs\ValueObjects\BrandingOptions;
+use Magpie\DTOs\ValueObjects\PaymentLinkItem;
+use Magpie\DTOs\ValueObjects\ShippingAddressCollection;
+
 class PaymentLink extends BaseResponse
 {
     public function __construct(
@@ -11,10 +15,11 @@ class PaymentLink extends BaseResponse
         public readonly string $object,
         public readonly bool $active,
         public readonly bool $allow_adjustable_quantity,
-        public readonly array $branding,
+        public readonly ?BrandingOptions $branding,
         public readonly int $created,
         public readonly string $currency,
         public readonly string $internal_name,
+        /** @var PaymentLinkItem[] */
         public readonly array $line_items,
         public readonly bool $livemode,
         public readonly array $metadata,
@@ -27,6 +32,6 @@ class PaymentLink extends BaseResponse
         public readonly ?int $maximum_payments = null,
         public readonly ?bool $phone_number_collection = null,
         public readonly ?string $redirect_url = null,
-        public readonly ?array $shipping_address_collection = null
+        public readonly ?ShippingAddressCollection $shipping_address_collection = null
     ) {}
 }

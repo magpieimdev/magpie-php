@@ -17,6 +17,7 @@ class Customer extends BaseResponse
         public readonly string $updated_at,
         public readonly array $metadata = [],
         public readonly ?string $name = null,
+        /** @var Source[] */
         public readonly array $sources = []
     ) {}
 }

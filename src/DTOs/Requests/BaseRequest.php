@@ -67,6 +67,11 @@ abstract class BaseRequest
             return $value->getTimestamp();
         }
         
+        // Handle value objects with toArray() method
+        if (is_object($value) && method_exists($value, 'toArray')) {
+            return $value->toArray();
+        }
+        
         if (is_array($value)) {
             return array_map(fn($item) => $this->convertValue($item), $value);
         }
