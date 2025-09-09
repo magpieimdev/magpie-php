@@ -19,6 +19,28 @@ class CustomersResourceTest extends TestCase
         \Mockery::close();
     }
 
+    /**
+     * Create complete customer mock data with all required fields for the Customer DTO.
+     */
+    public static function createCompleteCustomerData(array $overrides = []): array
+    {
+        $defaults = [
+            'id' => 'cus_test_123',
+            'object' => 'customer',
+            'email' => 'john@example.com',
+            'description' => 'Test customer',
+            'mobile_number' => '+639151234567',
+            'livemode' => false,
+            'created_at' => '2022-01-01T00:00:00Z',
+            'updated_at' => '2022-01-01T00:00:00Z',
+            'metadata' => [],
+            'name' => 'John Doe',
+            'sources' => [],
+        ];
+
+        return array_merge($defaults, $overrides);
+    }
+
     public function testCreate(): void
     {
         $client = \Mockery::mock(Client::class);
@@ -47,20 +69,18 @@ class CustomersResourceTest extends TestCase
             ],
         ];
 
-        // API response has name in metadata
-        $apiResponse = [
-            'id' => 'cus_test_123',
-            'object' => 'customer',
+        // API response with complete data for hybrid API
+        $apiResponse = self::createCompleteCustomerData([
             'email' => 'john@example.com',
-            'phone' => '+639151234567',
+            'mobile_number' => '+639151234567',
             'description' => 'Premium customer',
-            'created' => 1640995200,
             'metadata' => [
                 'user_id' => '12345',
                 'plan' => 'premium',
                 'name' => 'John Doe',
             ],
-        ];
+            'name' => 'John Doe',
+        ]);
 
         $client->shouldReceive('post')
             ->once()
@@ -69,15 +89,24 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->create($params);
 
+        // Test array access (backward compatibility)
         $this->assertSame('cus_test_123', $result['id']);
         $this->assertSame('customer', $result['object']);
-        $this->assertSame('John Doe', $result['name']); // Should be extracted from metadata
+        $this->assertSame('John Doe', $result['name']);
         $this->assertSame('john@example.com', $result['email']);
-        $this->assertSame('+639151234567', $result['phone']);
+        $this->assertSame('+639151234567', $result['mobile_number']);
         $this->assertSame('Premium customer', $result['description']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame('cus_test_123', $result->id);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame('John Doe', $result->name);
+        $this->assertSame('john@example.com', $result->email);
+        $this->assertSame('+639151234567', $result->mobile_number);
+        $this->assertSame('Premium customer', $result->description);
+        
         $this->assertSame('12345', $result['metadata']['user_id']);
         $this->assertSame('premium', $result['metadata']['plan']);
-        $this->assertSame('John Doe', $result['metadata']['name']); // Should still be in metadata
     }
 
     public function testRetrieve(): void
@@ -86,19 +115,17 @@ class CustomersResourceTest extends TestCase
         $resource = new CustomersResource($client);
 
         $customerId = 'cus_test_123';
-        $expectedResponse = [
+        $expectedResponse = self::createCompleteCustomerData([
             'id' => $customerId,
-            'object' => 'customer',
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'default_source' => 'src_456',
             'sources' => [
                 [
                     'id' => 'src_456',
                     'type' => 'gcash',
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('get')
             ->once()
@@ -107,10 +134,18 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->retrieve($customerId);
 
+        // Test array access (backward compatibility)
         $this->assertSame($customerId, $result['id']);
         $this->assertSame('John Doe', $result['name']);
         $this->assertSame('john@example.com', $result['email']);
-        $this->assertSame('src_456', $result['default_source']);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($customerId, $result->id);
+        $this->assertSame('John Doe', $result->name);
+        $this->assertSame('john@example.com', $result->email);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame('src_456', $result['sources'][0]['id']);
     }
 
     public function testUpdate(): void
@@ -136,18 +171,18 @@ class CustomersResourceTest extends TestCase
             ],
         ];
 
-        // API response has name in metadata
-        $apiResponse = [
+        // API response with complete data for hybrid API
+        $apiResponse = self::createCompleteCustomerData([
             'id' => $customerId,
-            'object' => 'customer',
             'email' => 'john@example.com',
-            'phone' => '+639157654321',
+            'mobile_number' => '+639157654321',
+            'name' => 'John Smith',
             'metadata' => [
                 'user_id' => '12345',
                 'plan' => 'enterprise',
                 'name' => 'John Smith',
             ],
-        ];
+        ]);
 
         $client->shouldReceive('put')
             ->once()
@@ -156,10 +191,17 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->update($customerId, $params);
 
+        // Test array access (backward compatibility)
         $this->assertSame($customerId, $result['id']);
         $this->assertSame('John Smith', $result['name']);
-        $this->assertSame('+639157654321', $result['phone']);
+        $this->assertSame('+639157654321', $result['mobile_number']);
         $this->assertSame('enterprise', $result['metadata']['plan']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($customerId, $result->id);
+        $this->assertSame('John Smith', $result->name);
+        $this->assertSame('+639157654321', $result->mobile_number);
+        $this->assertSame('customer', $result->object);
     }
 
     public function testRetrieveByEmail(): void
@@ -169,16 +211,16 @@ class CustomersResourceTest extends TestCase
 
         $email = 'john@example.com';
         
-        // API response has name in metadata
-        $apiResponse = [
+        // API response with complete data for hybrid API
+        $apiResponse = self::createCompleteCustomerData([
             'id' => 'cus_test_123',
-            'object' => 'customer',
             'email' => $email,
-            'phone' => '+639151234567',
+            'mobile_number' => '+639151234567',
+            'name' => 'John Doe',
             'metadata' => [
                 'name' => 'John Doe',
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -187,9 +229,17 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->retrieveByEmail($email);
 
+        // Test array access (backward compatibility)
         $this->assertSame('cus_test_123', $result['id']);
         $this->assertSame($email, $result['email']);
         $this->assertSame('John Doe', $result['name']);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame('cus_test_123', $result->id);
+        $this->assertSame($email, $result->email);
+        $this->assertSame('John Doe', $result->name);
+        $this->assertSame('customer', $result->object);
     }
 
     public function testAttachSource(): void
@@ -200,12 +250,10 @@ class CustomersResourceTest extends TestCase
         $customerId = 'cus_test_123';
         $sourceId = 'src_test_456';
 
-        $expectedResponse = [
+        $expectedResponse = self::createCompleteCustomerData([
             'id' => $customerId,
-            'object' => 'customer',
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'default_source' => $sourceId,
             'sources' => [
                 [
                     'id' => $sourceId,
@@ -213,7 +261,7 @@ class CustomersResourceTest extends TestCase
                     'status' => 'verified',
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -222,9 +270,16 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->attachSource($customerId, $sourceId);
 
+        // Test array access (backward compatibility)
         $this->assertSame($customerId, $result['id']);
-        $this->assertSame($sourceId, $result['default_source']);
         $this->assertSame($sourceId, $result['sources'][0]['id']);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($customerId, $result->id);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame('John Doe', $result->name);
+        $this->assertSame('john@example.com', $result->email);
     }
 
     public function testDetachSource(): void
@@ -235,14 +290,12 @@ class CustomersResourceTest extends TestCase
         $customerId = 'cus_test_123';
         $sourceId = 'src_test_456';
 
-        $expectedResponse = [
+        $expectedResponse = self::createCompleteCustomerData([
             'id' => $customerId,
-            'object' => 'customer',
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'default_source' => null,
             'sources' => [],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -251,9 +304,16 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->detachSource($customerId, $sourceId);
 
+        // Test array access (backward compatibility)
         $this->assertSame($customerId, $result['id']);
-        $this->assertNull($result['default_source']);
         $this->assertEmpty($result['sources']);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($customerId, $result->id);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame('John Doe', $result->name);
+        $this->assertSame('john@example.com', $result->email);
     }
 
     public function testCreateWithMinimalParams(): void
@@ -265,13 +325,12 @@ class CustomersResourceTest extends TestCase
             'email' => 'minimal@example.com',
         ];
 
-        $expectedResponse = [
+        $expectedResponse = self::createCompleteCustomerData([
             'id' => 'cus_test_456',
-            'object' => 'customer',
             'email' => 'minimal@example.com',
             'name' => null,
-            'phone' => null,
-        ];
+            'mobile_number' => null,
+        ]);
 
         $client->shouldReceive('post')
             ->once()
@@ -280,8 +339,16 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->create($params);
 
+        // Test array access (backward compatibility)
         $this->assertSame('cus_test_456', $result['id']);
         $this->assertSame('minimal@example.com', $result['email']);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame('cus_test_456', $result->id);
+        $this->assertSame('minimal@example.com', $result->email);
+        $this->assertSame('customer', $result->object);
+        $this->assertNull($result->name);
     }
 
     public function testCreateWithOptions(): void
@@ -304,14 +371,15 @@ class CustomersResourceTest extends TestCase
 
         $options = ['idempotency_key' => 'customer_create_123'];
 
-        // API response has name in metadata
-        $apiResponse = [
+        // API response with complete data for hybrid API
+        $apiResponse = self::createCompleteCustomerData([
             'id' => 'cus_test_789',
-            'object' => 'customer',
+            'email' => 'jane@example.com',
+            'name' => 'Jane Doe',
             'metadata' => [
                 'name' => 'Jane Doe',
             ],
-        ];
+        ]);
 
         $client->shouldReceive('post')
             ->once()
@@ -320,7 +388,16 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->create($params, $options);
 
+        // Test array access (backward compatibility)
         $this->assertSame('cus_test_789', $result['id']);
+        $this->assertSame('jane@example.com', $result['email']);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame('cus_test_789', $result->id);
+        $this->assertSame('jane@example.com', $result->email);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame('Jane Doe', $result->name);
     }
 
     public function testUpdateWithOptions(): void
@@ -339,10 +416,10 @@ class CustomersResourceTest extends TestCase
             ],
         ];
 
-        // API response has name in metadata
-        $apiResponse = [
+        // API response with complete data for hybrid API
+        $apiResponse = self::createCompleteCustomerData([
             'id' => $customerId,
-            'object' => 'customer',
+            'name' => 'Updated Name',
             'metadata' => [
                 'name' => 'Updated Name',
             ],
@@ -352,7 +429,7 @@ class CustomersResourceTest extends TestCase
                     'type' => 'gcash',
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('put')
             ->once()
@@ -361,8 +438,15 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->update($customerId, $params, $options);
 
+        // Test array access (backward compatibility)
         $this->assertSame('Updated Name', $result['name']);
         $this->assertArrayHasKey('sources', $result);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame('Updated Name', $result->name);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame($customerId, $result->id);
     }
 
     public function testHandlesApiErrors(): void
@@ -393,17 +477,18 @@ class CustomersResourceTest extends TestCase
         $email = 'test@example.com';
         $options = ['expand' => ['sources']];
 
-        // API response
-        $apiResponse = [
+        // API response with complete data for hybrid API
+        $apiResponse = self::createCompleteCustomerData([
             'id' => 'cus_test_123',
             'email' => $email,
+            'name' => 'Test User',
             'sources' => [
                 ['id' => 'src_123'],
             ],
             'metadata' => [
                 'name' => 'Test User',
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -412,8 +497,16 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->retrieveByEmail($email, $options);
 
+        // Test array access (backward compatibility)
         $this->assertSame($email, $result['email']);
         $this->assertArrayHasKey('sources', $result);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($email, $result->email);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame('Test User', $result->name);
+        $this->assertSame('cus_test_123', $result->id);
     }
 
     public function testAttachSourceWithOptions(): void
@@ -425,16 +518,15 @@ class CustomersResourceTest extends TestCase
         $sourceId = 'src_test_456';
         $options = ['expand' => ['sources.payments']];
 
-        $expectedResponse = [
+        $expectedResponse = self::createCompleteCustomerData([
             'id' => $customerId,
-            'default_source' => $sourceId,
             'sources' => [
                 [
                     'id' => $sourceId,
                     'payments' => [],
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -443,7 +535,14 @@ class CustomersResourceTest extends TestCase
 
         $result = $resource->attachSource($customerId, $sourceId, $options);
 
-        $this->assertSame($sourceId, $result['default_source']);
+        // Test array access (backward compatibility)
+        $this->assertSame($sourceId, $result['sources'][0]['id']);
         $this->assertArrayHasKey('payments', $result['sources'][0]);
+        $this->assertSame('customer', $result['object']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($customerId, $result->id);
+        $this->assertSame('customer', $result->object);
+        $this->assertSame($sourceId, $result['sources'][0]['id']);
     }
 }

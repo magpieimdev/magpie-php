@@ -21,6 +21,34 @@ class ChargesResourceTest extends TestCase
         \Mockery::close();
     }
 
+    public static function createCompleteChargeData(array $overrides = []): array
+    {
+        $defaults = [
+            'id' => 'ch_test_123',
+            'object' => 'charge',
+            'amount' => 50000,
+            'amount_refunded' => 0,
+            'authorized' => false,
+            'captured' => true,
+            'currency' => 'php',
+            'statement_descriptor' => '',
+            'description' => 'Test charge',
+            'source' => SourcesResourceTest::createCompleteSourceData(),
+            'require_auth' => false,
+            'owner' => null,
+            'action' => null,
+            'refunds' => [],
+            'status' => 'succeeded',
+            'livemode' => false,
+            'created_at' => '2022-01-01T00:00:00Z',
+            'updated_at' => '2022-01-01T00:00:00Z',
+            'metadata' => [],
+            'failure_data' => null,
+        ];
+
+        return array_merge($defaults, $overrides);
+    }
+
     public function testCreate(): void
     {
         $client = \Mockery::mock(Client::class);
@@ -38,24 +66,13 @@ class ChargesResourceTest extends TestCase
             ],
         ];
 
-        $expectedResponse = [
-            'id' => 'ch_test_123',
-            'object' => 'charge',
-            'amount' => 50000,
-            'currency' => 'php',
-            'source' => [
-                'id' => 'src_test_123',
-                'type' => 'card',
-            ],
+        $expectedResponse = $this->createCompleteChargeData([
             'description' => 'Payment for order #1001',
-            'status' => 'succeeded',
-            'captured' => true,
-            'created' => 1640995200,
             'metadata' => [
                 'order_id' => '1001',
                 'customer_id' => 'cust_123',
             ],
-        ];
+        ]);
 
         $client->shouldReceive('post')
             ->once()
@@ -86,15 +103,13 @@ class ChargesResourceTest extends TestCase
             'capture' => false,  // Authorize only
         ];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => 'ch_auth_456',
-            'object' => 'charge',
             'amount' => 30000,
-            'currency' => 'php',
-            'status' => 'authorized',
+            'status' => 'pending',
             'captured' => false,
             'description' => 'Authorization for reservation',
-        ];
+        ]);
 
         $client->shouldReceive('post')
             ->once()
@@ -104,7 +119,7 @@ class ChargesResourceTest extends TestCase
         $result = $resource->create($params);
 
         $this->assertSame('ch_auth_456', $result['id']);
-        $this->assertSame('authorized', $result['status']);
+        $this->assertSame('pending', $result['status']);
         $this->assertFalse($result['captured']);
     }
 
@@ -114,20 +129,25 @@ class ChargesResourceTest extends TestCase
         $resource = new ChargesResource($client);
 
         $chargeId = 'ch_test_123';
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'object' => 'charge',
-            'amount' => 50000,
-            'currency' => 'php',
-            'status' => 'succeeded',
-            'captured' => true,
-            'source' => [
+            'source' => SourcesResourceTest::createCompleteSourceData([
                 'id' => 'src_test_123',
-                'type' => 'card',
-                'last4' => '4242',
-            ],
-            'refunds' => [],
-        ];
+                'card' => [
+                    'id' => 'card_123',
+                    'object' => 'card',
+                    'name' => 'John Doe',
+                    'last4' => '4242',
+                    'exp_month' => '12',
+                    'exp_year' => '2025',
+                    'brand' => 'visa',
+                    'country' => 'US',
+                    'cvc_checked' => 'pass',
+                    'funding' => 'credit',
+                    'issuing_bank' => 'Test Bank',
+                ],
+            ]),
+        ]);
 
         $client->shouldReceive('get')
             ->once()
@@ -136,10 +156,15 @@ class ChargesResourceTest extends TestCase
 
         $result = $resource->retrieve($chargeId);
 
+        // Test array access (backward compatibility)
         $this->assertSame($chargeId, $result['id']);
         $this->assertSame('succeeded', $result['status']);
-        $this->assertSame('4242', $result['source']['last4']);
-        $this->assertEmpty($result['refunds']);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame($chargeId, $result->id);
+        $this->assertSame('succeeded', $result->status->value);
+        $this->assertSame('4242', $result->source->card->last4);
+        $this->assertEmpty($result->refunds);
     }
 
     public function testCapture(): void
@@ -150,14 +175,13 @@ class ChargesResourceTest extends TestCase
         $chargeId = 'ch_auth_123';
         $params = ['amount' => 25000];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'object' => 'charge',
             'amount' => 30000,
             'amount_captured' => 25000,
             'status' => 'succeeded',
             'captured' => true,
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -183,16 +207,15 @@ class ChargesResourceTest extends TestCase
             'otp' => '123456',
         ];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'object' => 'charge',
             'amount' => 40000,
             'status' => 'succeeded',
             'verification' => [
                 'status' => 'verified',
                 'verified_at' => 1640995200,
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -213,14 +236,13 @@ class ChargesResourceTest extends TestCase
 
         $chargeId = 'ch_auth_456';
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'object' => 'charge',
             'amount' => 30000,
-            'status' => 'canceled',
+            'status' => 'failed',
             'captured' => false,
             'voided_at' => 1640995200,
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -230,7 +252,7 @@ class ChargesResourceTest extends TestCase
         $result = $resource->void($chargeId);
 
         $this->assertSame($chargeId, $result['id']);
-        $this->assertSame('canceled', $result['status']);
+        $this->assertSame('failed', $result['status']);
         $this->assertFalse($result['captured']);
         $this->assertArrayHasKey('voided_at', $result);
     }
@@ -246,9 +268,8 @@ class ChargesResourceTest extends TestCase
             'reason' => 'requested_by_customer',
         ];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'object' => 'charge',
             'amount' => 50000,
             'amount_refunded' => 50000,
             'status' => 'succeeded',
@@ -261,7 +282,7 @@ class ChargesResourceTest extends TestCase
                     'status' => 'succeeded',
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -288,9 +309,8 @@ class ChargesResourceTest extends TestCase
             'reason' => 'duplicate',
         ];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'object' => 'charge',
             'amount' => 50000,
             'amount_refunded' => 25000,
             'status' => 'succeeded',
@@ -302,7 +322,7 @@ class ChargesResourceTest extends TestCase
                     'reason' => 'duplicate',
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -329,11 +349,10 @@ class ChargesResourceTest extends TestCase
 
         $options = ['idempotency_key' => 'charge_create_123'];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => 'ch_test_789',
-            'object' => 'charge',
             'amount' => 100000,
-        ];
+        ]);
 
         $client->shouldReceive('post')
             ->once()
@@ -353,23 +372,31 @@ class ChargesResourceTest extends TestCase
         $chargeId = 'ch_test_123';
         $options = ['expand' => ['source', 'refunds']];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
-            'source' => [
+            'source' => SourcesResourceTest::createCompleteSourceData([
                 'id' => 'src_123',
-                'type' => 'card',
                 'card' => [
-                    'brand' => 'visa',
+                    'id' => 'card_123',
+                    'object' => 'card',
+                    'name' => 'John Doe',
                     'last4' => '4242',
+                    'exp_month' => '12',
+                    'exp_year' => '2025',
+                    'brand' => 'visa',
+                    'country' => 'US',
+                    'cvc_checked' => 'pass',
+                    'funding' => 'credit',
+                    'issuing_bank' => 'Test Bank',
                 ],
-            ],
+            ]),
             'refunds' => [
                 [
                     'id' => 'ref_123',
                     'amount' => 10000,
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('get')
             ->once()
@@ -433,14 +460,13 @@ class ChargesResourceTest extends TestCase
         $params = ['amount' => 30000];
         $options = ['expand' => ['source']];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
             'amount_captured' => 30000,
-            'source' => [
+            'source' => SourcesResourceTest::createCompleteSourceData([
                 'id' => 'src_123',
-                'type' => 'card',
-            ],
-        ];
+            ]),
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -462,7 +488,7 @@ class ChargesResourceTest extends TestCase
         $params = ['amount' => 20000];
         $options = ['expand' => ['refunds.charges']];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
             'amount_refunded' => 20000,
             'refunds' => [
@@ -472,7 +498,7 @@ class ChargesResourceTest extends TestCase
                     'charges' => [],
                 ],
             ],
-        ];
+        ]);
 
         $client->shouldReceive('request')
             ->once()
@@ -494,14 +520,14 @@ class ChargesResourceTest extends TestCase
         $params = ['confirmation_id' => '987654321'];
         $options = ['expand' => ['source']];
 
-        $expectedResponse = [
+        $expectedResponse = $this->createCompleteChargeData([
             'id' => $chargeId,
             'status' => 'succeeded',
-            'source' => [
+            'source' => SourcesResourceTest::createCompleteSourceData([
                 'id' => 'src_456',
                 'type' => 'bank_debit',
-            ],
-        ];
+            ]),
+        ]);
 
         $client->shouldReceive('request')
             ->once()

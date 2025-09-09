@@ -55,7 +55,7 @@ class WebhooksResourceTest extends TestCase
         $client = \Mockery::mock(Client::class);
         $resource = new WebhooksResource($client);
 
-        $payload = '{"type":"payment.completed"}';
+        $payload = '{"type":"charge.succeeded"}';
         $secret = 'whsec_custom_secret';
 
         $config = [
@@ -77,7 +77,18 @@ class WebhooksResourceTest extends TestCase
         $client = \Mockery::mock(Client::class);
         $resource = new WebhooksResource($client);
 
-        $payload = '{"type":"charge.succeeded","data":{"object":{"id":"ch_test_123","amount":10000}}}';
+        $payload = '{
+            "id": "evt_test_webhook",
+            "type": "charge.succeeded",
+            "data": {
+                "object": {
+                    "id": "ch_test_123",
+                    "amount": 10000
+                }
+            },
+            "created": ' . time() . ',
+            "livemode": false
+        }';
         $secret = 'whsec_test_secret';
 
         $expectedSignature = hash_hmac('sha256', $payload, $secret);
@@ -85,10 +96,20 @@ class WebhooksResourceTest extends TestCase
 
         $event = $resource->constructEvent($payload, $signature, $secret);
 
-        $this->assertIsArray($event);
+        // Test hybrid API - object access
+        $this->assertInstanceOf(\Magpie\DTOs\Responses\WebhookEvent::class, $event);
+        $this->assertSame('evt_test_webhook', $event->id);
+        $this->assertSame(\Magpie\Enums\WebhookEventType::CHARGE_SUCCEEDED, $event->type);
+        $this->assertSame('ch_test_123', $event->data['object']['id']);
+        $this->assertSame(10000, $event->data['object']['amount']);
+        $this->assertFalse($event->livemode);
+        
+        // Test hybrid API - array access
+        $this->assertSame('evt_test_webhook', $event['id']);
         $this->assertSame('charge.succeeded', $event['type']);
         $this->assertSame('ch_test_123', $event['data']['object']['id']);
         $this->assertSame(10000, $event['data']['object']['amount']);
+        $this->assertFalse($event['livemode']);
     }
 
     public function testConstructEventWithInvalidSignature(): void
@@ -272,7 +293,18 @@ class WebhooksResourceTest extends TestCase
         $client = \Mockery::mock(Client::class);
         $resource = new WebhooksResource($client);
 
-        $payload = '{"type":"payment.completed","id":"evt_123"}';
+        $payload = '{
+            "id": "evt_123",
+            "type": "charge.succeeded",
+            "data": {
+                "object": {
+                    "id": "ch_custom_456",
+                    "amount": 5000
+                }
+            },
+            "created": ' . time() . ',
+            "livemode": true
+        }';
         $secret = 'whsec_custom_secret';
 
         $config = [
@@ -286,8 +318,17 @@ class WebhooksResourceTest extends TestCase
 
         $event = $resource->constructEvent($payload, $signature, $secret, $config);
 
-        $this->assertIsArray($event);
-        $this->assertSame('payment.completed', $event['type']);
+        // Test hybrid API - object access
+        $this->assertInstanceOf(\Magpie\DTOs\Responses\WebhookEvent::class, $event);
+        $this->assertSame('evt_123', $event->id);
+        $this->assertSame(\Magpie\Enums\WebhookEventType::CHARGE_SUCCEEDED, $event->type);
+        $this->assertSame('ch_custom_456', $event->data['object']['id']);
+        $this->assertTrue($event->livemode);
+        
+        // Test hybrid API - array access
         $this->assertSame('evt_123', $event['id']);
+        $this->assertSame('charge.succeeded', $event['type']);
+        $this->assertSame('ch_custom_456', $event['data']['object']['id']);
+        $this->assertTrue($event['livemode']);
     }
 }

@@ -19,21 +19,29 @@ class OrganizationResourceTest extends TestCase
         \Mockery::close();
     }
 
-    public function testMe(): void
+    /**
+     * Create complete organization mock data with all required fields for the Organization DTO.
+     */
+    public static function createCompleteOrganizationData(array $overrides = []): array
     {
-        $client = \Mockery::mock(Client::class);
-        $resource = new OrganizationResource($client);
-
-        $expectedResponse = [
+        $defaults = [
             'object' => 'organization',
             'id' => 'org_test_123456789',
             'title' => 'Test Organization',
             'account_name' => 'Test Merchant',
+            'statement_descriptor' => 'TEST ORG',
             'pk_test_key' => 'pk_test_abc123def456',
             'sk_test_key' => 'sk_test_xyz789uvw321',
             'pk_live_key' => 'pk_live_ghi789jkl012',
             'sk_live_key' => 'sk_live_mno345pqr678',
+            'branding' => [
+                'icon' => 'https://example.com/test-icon.png',
+                'brand_color' => '#000000',
+                'accent_color' => '#ffffff',
+            ],
             'status' => 'approved',
+            'created_at' => '2022-01-01T00:00:00Z',
+            'updated_at' => '2022-01-01T00:00:00Z',
             'payment_method_settings' => [
                 'card' => [
                     'status' => 'approved',
@@ -44,18 +52,26 @@ class OrganizationResourceTest extends TestCase
                     'rate' => ['mdr' => 0.025, 'fixed_fee' => 0],
                 ],
             ],
-            'branding' => [
-                'icon' => 'https://example.com/test-icon.png',
-                'brand_color' => '#000000',
-                'accent_color' => '#ffffff',
-            ],
+            'rates' => [],
             'payout_settings' => [
                 'schedule' => 'daily',
                 'delivery_type' => 'standard',
                 'bank_code' => 'TEST_BANK',
                 'account_number' => '1234567890',
             ],
+            'metadata' => [],
+            'business_address' => null,
         ];
+
+        return array_merge($defaults, $overrides);
+    }
+
+    public function testMe(): void
+    {
+        $client = \Mockery::mock(Client::class);
+        $resource = new OrganizationResource($client);
+
+        $expectedResponse = self::createCompleteOrganizationData();
 
         $client->shouldReceive('get')
             ->once()
@@ -64,12 +80,25 @@ class OrganizationResourceTest extends TestCase
 
         $result = $resource->me();
 
+        // Test array access (backward compatibility)
         $this->assertSame('organization', $result['object']);
         $this->assertSame('org_test_123456789', $result['id']);
         $this->assertSame('Test Organization', $result['title']);
+        $this->assertSame('Test Merchant', $result['account_name']);
+        $this->assertSame('TEST ORG', $result['statement_descriptor']);
         $this->assertSame('approved', $result['status']);
         $this->assertArrayHasKey('pk_test_key', $result);
         $this->assertArrayHasKey('pk_live_key', $result);
+        
+        // Test object access (new hybrid API)
+        $this->assertSame('organization', $result->object);
+        $this->assertSame('org_test_123456789', $result->id);
+        $this->assertSame('Test Organization', $result->title);
+        $this->assertSame('Test Merchant', $result->account_name);
+        $this->assertSame('TEST ORG', $result->statement_descriptor);
+        $this->assertSame('approved', $result->status);
+        $this->assertSame('pk_test_abc123def456', $result->pk_test_key);
+        $this->assertSame('pk_live_ghi789jkl012', $result->pk_live_key);
     }
 
     public function testGetPublicKeyForTestEnvironment(): void
