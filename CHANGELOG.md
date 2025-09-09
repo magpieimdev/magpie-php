@@ -5,29 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-09-09
+
+### Added
+
+- 🎯 **Hybrid API Design**: Support for both array-based and DTO-based usage
+- 🛡️ **Type-Safe Value Objects**: Complete Node.js SDK alignment with proper typing
+- 🔄 **Customer Name Transformation**: Automatic handling of name ↔ metadata.name
+- ⬅️ **Backward Compatibility**: Existing array-based code continues unchanged
+- 📦 **Comprehensive Value Objects**: LineItem, BrandingOptions, Address hierarchies, Source card/bank details
+- 🏗️ **Complex Nested Types**: ChargeFailure, SourceOwner, CheckoutSession addresses, and more
+- 🎨 **Smart Serialization**: Automatic conversion between arrays and typed objects
+
+### Enhanced
+
+- All service interfaces now support `Request|array` parameters
+- All resource classes handle both array and DTO inputs seamlessly
+- Customer resource includes smart name field transformation
+- Complete DTOs with proper value objects instead of generic arrays
+- Enhanced BaseRequest/BaseResponse with intelligent toArray() methods
+- Full Node.js TypeScript interface parity in PHP
+- README updated with concise hybrid API examples
+
 ## [1.0.0] - 2025-09-05
 
 ### Added
 
 #### 🚀 Complete SDK Implementation
+
 - **100% Feature Parity** with Node.js Magpie SDK
 - **Full PHP 8.1+** implementation with strict type declarations
 - **Laravel Integration** with service provider, facades, and configuration publishing
 - **Comprehensive Documentation** with extensive usage examples
 
 #### 💳 Payment Processing
+
 - **ChargesResource**: Create, retrieve, capture, void, refund, and verify charges
 - **Authorization & Capture**: Two-step payment processing support
 - **Refunds**: Full and partial refund capabilities with reason tracking
 - **Payment Verification**: 3D Secure and bank payment verification
 
 #### 👥 Customer Management
+
 - **CustomersResource**: Complete CRUD operations
 - **Email Lookup**: Retrieve customers by email address
 - **Source Management**: Attach/detach payment sources to customers
 - **Extended Methods**: `retrieveByEmail()`, `attachSource()`, `detachSource()`
 
 #### 💰 Payment Sources
+
 - **SourcesResource**: Support for all payment methods
 - **Credit/Debit Cards**: Full card processing with address validation
 - **Bank Transfers**: BPI, BDO, and other Philippine banks
@@ -35,12 +61,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **QR Codes**: QR PH and other QR payment methods
 
 #### 🛒 Checkout & Payment Pages
+
 - **CheckoutSessionsResource**: Hosted checkout page management
 - **Session Lifecycle**: Create, retrieve, capture, and expire operations
 - **Custom Branding**: Logo, colors, and messaging customization
 - **Multi-base URL Support**: Uses `https://new.pay.magpie.im` for checkout
 
 #### 📧 Payment Requests
+
 - **PaymentRequestsResource**: Email and SMS payment delivery
 - **Multi-channel Delivery**: Support for email, SMS, or both
 - **Advanced Configuration**: Custom branding, payment methods, messaging
@@ -48,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **API Endpoint**: Uses `https://request.magpie.im/api/v1`
 
 #### 🔗 Payment Links
+
 - **PaymentLinksResource**: Shareable payment links
 - **Link Customization**: Adjustable quantities, product images, descriptions
 - **Link Management**: Create, update, activate, and deactivate
@@ -55,6 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **API Endpoint**: Uses `https://buy.magpie.im/api/v1`
 
 #### 🔐 Webhooks & Security
+
 - **WebhooksResource**: Complete webhook verification system
 - **Signature Verification**: HMAC-SHA256 with timing-safe comparison
 - **Timestamp Validation**: Configurable tolerance for replay protection
@@ -63,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Methods**: `verifySignature()`, `verifySignatureWithTimestamp()`, `constructEvent()`
 
 #### 🌐 HTTP & Networking
+
 - **Guzzle-based Client**: Advanced HTTP client with middleware support
 - **Automatic Retries**: Exponential backoff with jitter
 - **Request Logging**: Debug mode with detailed tracing
@@ -71,6 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Multiple Base URLs**: Resource-specific API endpoints
 
 #### ⚠️ Error Handling
+
 - **Exception Hierarchy**: Specific exceptions for different error types
   - `ConfigurationException`: SDK configuration errors
   - `AuthenticationException`: API key and auth errors
@@ -82,12 +114,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Rich Error Data**: Request IDs, status codes, detailed messages
 
 #### 🏗️ Laravel Integration
+
 - **Service Provider**: `MagpieServiceProvider` with auto-registration
 - **Facade**: Clean Laravel-style API access
 - **Configuration Publishing**: Environment-based setup
 - **Dependency Injection**: Full IoC container support
 
 #### 🛠️ Developer Experience
+
 - **Type Safety**: Complete PHP 8.1+ type declarations
 - **IDE Support**: Full autocomplete and intellisense
 - **Comprehensive Examples**: Real-world usage scenarios
@@ -95,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unit Tests**: Extensive test suite with mocking
 
 #### 📚 Documentation
+
 - **Complete README**: Installation, usage, and examples
 - **API Reference**: All methods documented with examples
 - **Laravel Guide**: Framework-specific integration instructions
@@ -104,17 +139,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Specifications
 
 #### Requirements
+
 - **PHP**: 8.1 or higher
 - **Laravel**: 10+ (for integration features)
 - **HTTP Client**: Guzzle 7.0+
 
 #### Dependencies
+
 - `guzzlehttp/guzzle`: ^7.0 (HTTP client)
 - `psr/http-client`: ^1.0 (PSR-18 interface)
 - `psr/http-message`: ^1.0|^2.0 (PSR-7 interface)
 - `psr/log`: ^1.0|^2.0|^3.0 (PSR-3 logging)
 
 #### Development Dependencies
+
 - `phpunit/phpunit`: ^10.0 (Testing framework)
 - `mockery/mockery`: ^1.5 (Mocking library)
 - `phpstan/phpstan`: ^1.0 (Static analysis)
@@ -122,11 +160,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `orchestra/testbench`: ^8.0 (Laravel testing)
 
 ### Installation
+
 ```bash
 composer require magpieim/magpie-php
 ```
 
 ### Basic Usage
+
 ```php
 use Magpie\Magpie;
 
@@ -141,6 +181,7 @@ $charge = $magpie->charges->create([
 ```
 
 ### Laravel Usage
+
 ```php
 use Magpie\Laravel\Facades\Magpie;
 
@@ -151,6 +192,7 @@ $customer = Magpie::customers()->create([
 ```
 
 ### Security Features
+
 - Webhook signature verification with timing-safe comparison
 - API key validation on initialization
 - SSL certificate verification
@@ -158,6 +200,7 @@ $customer = Magpie::customers()->create([
 - Secure error handling (no sensitive data in logs)
 
 ### Performance Features
+
 - Connection pooling and reuse
 - Automatic retry with exponential backoff
 - Efficient HTTP middleware stack
@@ -169,6 +212,7 @@ $customer = Magpie::customers()->create([
 ## Future Releases
 
 ### Planned for v1.1.0
+
 - Integration test suite with live API
 - Enhanced Laravel features (Artisan commands, migrations)
 - Batch operations support
@@ -176,6 +220,7 @@ $customer = Magpie::customers()->create([
 - Performance monitoring tools
 
 ### Planned for v1.2.0
+
 - Multi-tenancy support
 - Async/parallel request capabilities
 - Enhanced webhook management
