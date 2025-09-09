@@ -49,7 +49,7 @@ class ValidationException extends MagpieException
     /**
      * Create a ValidationException from an HTTP response.
      *
-     * @param ResponseInterface $response The HTTP response
+     * @param \Psr\Http\Message\ResponseInterface $response The HTTP response
      */
     public static function fromResponse(\Psr\Http\Message\ResponseInterface $response): self
     {
@@ -75,7 +75,7 @@ class ValidationException extends MagpieException
         $type = $error['type'] ?? static::mapStatusToErrorType($statusCode);
         $code = $error['code'] ?? "http_{$statusCode}";
         $details = $error['details'] ?? [];
-        
+
         // Extract validation errors - they might be in 'errors', 'details', or embedded in message
         $errors = [];
         if (isset($error['errors']) && is_array($error['errors'])) {
@@ -84,6 +84,7 @@ class ValidationException extends MagpieException
             $errors = $details;
         }
 
+        /* @var static */
         return new static(
             $message,
             $errors,
@@ -112,4 +113,3 @@ class ValidationException extends MagpieException
         };
     }
 }
-

@@ -19,5 +19,6 @@ class Customer extends BaseResponse
         public readonly ?string $name = null,
         /** @var Source[] */
         public readonly array $sources = []
-    ) {}
+    ) {
+    }
 }

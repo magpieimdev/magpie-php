@@ -17,5 +17,6 @@ class WebhookEvent extends BaseResponse
         public readonly ?string $api_version = null,
         public readonly ?int $pending_webhooks = null,
         public readonly ?array $request = null
-    ) {}
+    ) {
+    }
 }

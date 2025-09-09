@@ -26,5 +26,6 @@ class Source extends BaseResponse
         public readonly ?SourceCard $card = null,
         public readonly ?SourceBankAccount $bank_account = null,
         public readonly ?SourceOwner $owner = null
-    ) {}
+    ) {
+    }
 }

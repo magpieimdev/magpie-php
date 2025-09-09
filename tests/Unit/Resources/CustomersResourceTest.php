@@ -96,7 +96,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('john@example.com', $result['email']);
         $this->assertSame('+639151234567', $result['mobile_number']);
         $this->assertSame('Premium customer', $result['description']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('cus_test_123', $result->id);
         $this->assertSame('customer', $result->object);
@@ -104,7 +104,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('john@example.com', $result->email);
         $this->assertSame('+639151234567', $result->mobile_number);
         $this->assertSame('Premium customer', $result->description);
-        
+
         $this->assertSame('12345', $result['metadata']['user_id']);
         $this->assertSame('premium', $result['metadata']['plan']);
     }
@@ -139,7 +139,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('John Doe', $result['name']);
         $this->assertSame('john@example.com', $result['email']);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($customerId, $result->id);
         $this->assertSame('John Doe', $result->name);
@@ -196,7 +196,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('John Smith', $result['name']);
         $this->assertSame('+639157654321', $result['mobile_number']);
         $this->assertSame('enterprise', $result['metadata']['plan']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($customerId, $result->id);
         $this->assertSame('John Smith', $result->name);
@@ -210,7 +210,7 @@ class CustomersResourceTest extends TestCase
         $resource = new CustomersResource($client);
 
         $email = 'john@example.com';
-        
+
         // API response with complete data for hybrid API
         $apiResponse = self::createCompleteCustomerData([
             'id' => 'cus_test_123',
@@ -224,7 +224,7 @@ class CustomersResourceTest extends TestCase
 
         $client->shouldReceive('request')
             ->once()
-            ->with('GET', 'customers/by_email/' . $email, null, [])
+            ->with('GET', 'customers/by_email/'.$email, null, [])
             ->andReturn($apiResponse);
 
         $result = $resource->retrieveByEmail($email);
@@ -234,7 +234,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame($email, $result['email']);
         $this->assertSame('John Doe', $result['name']);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('cus_test_123', $result->id);
         $this->assertSame($email, $result->email);
@@ -274,7 +274,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame($customerId, $result['id']);
         $this->assertSame($sourceId, $result['sources'][0]['id']);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($customerId, $result->id);
         $this->assertSame('customer', $result->object);
@@ -308,7 +308,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame($customerId, $result['id']);
         $this->assertEmpty($result['sources']);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($customerId, $result->id);
         $this->assertSame('customer', $result->object);
@@ -343,7 +343,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('cus_test_456', $result['id']);
         $this->assertSame('minimal@example.com', $result['email']);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('cus_test_456', $result->id);
         $this->assertSame('minimal@example.com', $result->email);
@@ -392,7 +392,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('cus_test_789', $result['id']);
         $this->assertSame('jane@example.com', $result['email']);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('cus_test_789', $result->id);
         $this->assertSame('jane@example.com', $result->email);
@@ -442,7 +442,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame('Updated Name', $result['name']);
         $this->assertArrayHasKey('sources', $result);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('Updated Name', $result->name);
         $this->assertSame('customer', $result->object);
@@ -492,7 +492,7 @@ class CustomersResourceTest extends TestCase
 
         $client->shouldReceive('request')
             ->once()
-            ->with('GET', 'customers/by_email/' . $email, null, $options)
+            ->with('GET', 'customers/by_email/'.$email, null, $options)
             ->andReturn($apiResponse);
 
         $result = $resource->retrieveByEmail($email, $options);
@@ -501,7 +501,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame($email, $result['email']);
         $this->assertArrayHasKey('sources', $result);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($email, $result->email);
         $this->assertSame('customer', $result->object);
@@ -539,7 +539,7 @@ class CustomersResourceTest extends TestCase
         $this->assertSame($sourceId, $result['sources'][0]['id']);
         $this->assertArrayHasKey('payments', $result['sources'][0]);
         $this->assertSame('customer', $result['object']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($customerId, $result->id);
         $this->assertSame('customer', $result->object);

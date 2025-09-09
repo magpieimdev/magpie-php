@@ -11,8 +11,8 @@ use Magpie\DTOs\ValueObjects\LineItem;
 use Magpie\DTOs\ValueObjects\ShippingAddressCollection;
 use Magpie\Enums\BillingAddressCollection;
 use Magpie\Enums\CheckoutSubmitType;
-use Magpie\Enums\SessionMode;
 use Magpie\Enums\PaymentStatus;
+use Magpie\Enums\SessionMode;
 
 class CheckoutSession extends BaseResponse
 {
@@ -54,5 +54,6 @@ class CheckoutSession extends BaseResponse
         public readonly ?Charge $payment_details = null,
         public readonly ?CheckoutSessionAddress $shipping = null,
         public readonly ?ShippingAddressCollection $shipping_address_collection = null
-    ) {}
+    ) {
+    }
 }

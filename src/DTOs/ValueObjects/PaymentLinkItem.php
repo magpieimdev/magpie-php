@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * A line item for a payment link with inventory tracking.
- * 
+ *
  * Extends the base LineItem with additional fields specific
  * to payment links, including stock management.
  */
@@ -51,6 +51,6 @@ class PaymentLinkItem extends LineItem
             'description' => $this->description,
             'image' => $this->image,
             'remaining' => $this->remaining,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

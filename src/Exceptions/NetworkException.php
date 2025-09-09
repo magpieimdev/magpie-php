@@ -20,11 +20,11 @@ class NetworkException extends MagpieException
     /**
      * Create a new NetworkException.
      *
-     * @param string $message The exception message
+     * @param string      $message  The exception message
      * @param ?\Throwable $previous Previous exception
      */
     public function __construct(string $message, ?\Throwable $previous = null)
     {
-        parent::__construct($message, $this->type, 'network_error', 0, null, [], null, $previous);
+        parent::__construct($message, $this->type, 'network_error', 0, null, [], null, [], $previous);
     }
 }

@@ -21,24 +21,25 @@ class CreatePaymentRequestRequest extends BaseRequest
         public readonly ?string $message = null,
         public readonly array $metadata = [],
         public readonly ?bool $require_auth = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a CreatePaymentRequestRequest from an array with automatic conversion.
      */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         return new self(
             currency: $data['currency'],
             customer: $data['customer'],
             delivery_methods: $data['delivery_methods'],
             line_items: array_map(
-                fn($item) => is_array($item) ? LineItem::fromArray($item) : $item,
+                fn ($item) => is_array($item) ? LineItem::fromArray($item) : $item,
                 $data['line_items']
             ),
             payment_method_types: $data['payment_method_types'],
-            branding: isset($data['branding']) && is_array($data['branding']) 
-                ? BrandingOptions::fromArray($data['branding']) 
+            branding: isset($data['branding']) && is_array($data['branding'])
+                ? BrandingOptions::fromArray($data['branding'])
                 : $data['branding'] ?? null,
             message: $data['message'] ?? null,
             metadata: $data['metadata'] ?? [],

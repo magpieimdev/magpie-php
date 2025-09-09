@@ -8,7 +8,7 @@ use Magpie\Enums\RefundStatus;
 
 /**
  * A refund represents the return of funds to a customer.
- * 
+ *
  * Refunds are created against charges and return money to the
  * customer's original payment method. They can be full or partial.
  */
@@ -31,7 +31,8 @@ class Refund
         public readonly string $created_at,
         /** The last update timestamp of the refund in ISO 8601 format. */
         public readonly ?string $updated_at = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a Refund from an array.
@@ -64,6 +65,6 @@ class Refund
             'status' => $this->status->value,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

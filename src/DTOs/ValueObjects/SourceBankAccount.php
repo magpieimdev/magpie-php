@@ -26,7 +26,8 @@ class SourceBankAccount
         public readonly string $expires_at,
         /** Set of key-value pairs attached to the bank account object. */
         public readonly array $metadata
-    ) {}
+    ) {
+    }
 
     /**
      * Create a SourceBankAccount from an array.

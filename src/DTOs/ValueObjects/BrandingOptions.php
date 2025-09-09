@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Branding configuration for payment pages and receipts.
- * 
+ *
  * Controls the visual appearance of checkout pages, payment links,
  * and other customer-facing payment interfaces.
  */
@@ -23,7 +23,8 @@ class BrandingOptions
         public readonly string $primary_color = '',
         /** A CSS color value representing the secondary branding color. */
         public readonly string $secondary_color = ''
-    ) {}
+    ) {
+    }
 
     /**
      * Create a BrandingOptions from an array.
@@ -50,6 +51,6 @@ class BrandingOptions
             'use_logo' => $this->use_logo,
             'primary_color' => $this->primary_color,
             'secondary_color' => $this->secondary_color,
-        ], fn($value) => $value !== null && $value !== '');
+        ], fn ($value) => null !== $value && '' !== $value);
     }
 }

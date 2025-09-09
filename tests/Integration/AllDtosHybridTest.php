@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Comprehensive test to verify all DTOs support hybrid API access.
- * 
+ *
  * This test ensures that every DTO in the SDK can be accessed both as
  * objects (new way) and as arrays (backward compatible way).
  */
@@ -35,7 +35,7 @@ class AllDtosHybridTest extends TestCase
             'livemode' => false,
             'created_at' => '2024-01-01T00:00:00Z',
             'updated_at' => '2024-01-01T00:00:00Z',
-            'metadata' => []
+            'metadata' => [],
         ];
 
         $source = Source::fromArray($data);
@@ -43,7 +43,7 @@ class AllDtosHybridTest extends TestCase
         // Object access
         $this->assertSame('src_123', $source->id);
         $this->assertSame(SourceType::CARD, $source->type);
-        
+
         // Array access
         $this->assertSame('src_123', $source['id']);
         $this->assertSame('card', $source['type']);
@@ -62,7 +62,7 @@ class AllDtosHybridTest extends TestCase
             'updated_at' => '2024-01-01T00:00:00Z',
             'metadata' => [],
             'name' => 'Test User',
-            'sources' => []
+            'sources' => [],
         ];
 
         $customer = Customer::fromArray($data);
@@ -70,7 +70,7 @@ class AllDtosHybridTest extends TestCase
         // Object access
         $this->assertSame('cus_123', $customer->id);
         $this->assertSame('test@example.com', $customer->email);
-        
+
         // Array access
         $this->assertSame('cus_123', $customer['id']);
         $this->assertSame('test@example.com', $customer['email']);
@@ -98,7 +98,7 @@ class AllDtosHybridTest extends TestCase
                 'livemode' => false,
                 'created_at' => '2024-01-01T00:00:00Z',
                 'updated_at' => '2024-01-01T00:00:00Z',
-                'metadata' => []
+                'metadata' => [],
             ],
             'require_auth' => false,
             'owner' => null,
@@ -109,7 +109,7 @@ class AllDtosHybridTest extends TestCase
             'created_at' => '2024-01-01T00:00:00Z',
             'updated_at' => '2024-01-01T00:00:00Z',
             'metadata' => [],
-            'failure_data' => null
+            'failure_data' => null,
         ];
 
         $charge = Charge::fromArray($data);
@@ -117,7 +117,7 @@ class AllDtosHybridTest extends TestCase
         // Object access
         $this->assertSame('ch_123', $charge->id);
         $this->assertSame(10000, $charge->amount);
-        
+
         // Array access
         $this->assertSame('ch_123', $charge['id']);
         $this->assertSame(10000, $charge['amount']);
@@ -144,7 +144,7 @@ class AllDtosHybridTest extends TestCase
             'merchant' => [
                 'name' => 'Test Merchant',
                 'support_email' => 'support@example.com',
-                'support_phone' => '+639151234567'
+                'support_phone' => '+639151234567',
             ],
             'metadata' => [],
             'mode' => 'payment',
@@ -154,7 +154,7 @@ class AllDtosHybridTest extends TestCase
             'phone_number_collection' => false,
             'require_auth' => false,
             'submit_type' => 'pay',
-            'success_url' => 'https://example.com/success'
+            'success_url' => 'https://example.com/success',
         ];
 
         $session = CheckoutSession::fromArray($data);
@@ -163,7 +163,7 @@ class AllDtosHybridTest extends TestCase
         $this->assertSame('cs_test_123', $session->id);
         $this->assertSame(10000, $session->amount_total);
         $this->assertSame('Test Merchant', $session->merchant->name);
-        
+
         // Array access
         $this->assertSame('cs_test_123', $session['id']);
         $this->assertSame(10000, $session['amount_total']);
@@ -190,7 +190,7 @@ class AllDtosHybridTest extends TestCase
             'rates' => [],
             'payout_settings' => [],
             'metadata' => [],
-            'business_address' => '123 Test St, Test City'
+            'business_address' => '123 Test St, Test City',
         ];
 
         $organization = Organization::fromArray($data);
@@ -199,7 +199,7 @@ class AllDtosHybridTest extends TestCase
         $this->assertSame('org_test_123', $organization->id);
         $this->assertSame('Test Organization', $organization->title);
         $this->assertSame('pk_test_123456', $organization->pk_test_key);
-        
+
         // Array access
         $this->assertSame('org_test_123', $organization['id']);
         $this->assertSame('Test Organization', $organization['title']);
@@ -224,7 +224,7 @@ class AllDtosHybridTest extends TestCase
             'require_auth' => false,
             'updated' => 1704067200,
             'url' => 'https://buy.magpie.im/pl_test_123',
-            'description' => 'Test payment link description'
+            'description' => 'Test payment link description',
         ];
 
         $paymentLink = PaymentLink::fromArray($data);
@@ -233,7 +233,7 @@ class AllDtosHybridTest extends TestCase
         $this->assertSame('pl_test_123', $paymentLink->id);
         $this->assertSame('Test Payment Link', $paymentLink->internal_name);
         $this->assertTrue($paymentLink->active);
-        
+
         // Array access
         $this->assertSame('pl_test_123', $paymentLink['id']);
         $this->assertSame('Test Payment Link', $paymentLink['internal_name']);
@@ -255,7 +255,7 @@ class AllDtosHybridTest extends TestCase
             'delivery_methods' => ['email', 'sms'],
             'delivered' => [
                 'email' => true,
-                'sms' => false
+                'sms' => false,
             ],
             'line_items' => [],
             'livemode' => false,
@@ -268,7 +268,7 @@ class AllDtosHybridTest extends TestCase
             'subtotal' => 5000,
             'total' => 5000,
             'updated' => 1704067200,
-            'voided' => false
+            'voided' => false,
         ];
 
         $paymentRequest = PaymentRequest::fromArray($data);
@@ -278,7 +278,7 @@ class AllDtosHybridTest extends TestCase
         $this->assertSame('Test Account', $paymentRequest->account_name);
         $this->assertSame(5000, $paymentRequest->total);
         $this->assertTrue($paymentRequest->delivered->email);
-        
+
         // Array access
         $this->assertSame('pr_test_123', $paymentRequest['id']);
         $this->assertSame('Test Account', $paymentRequest['account_name']);
@@ -294,14 +294,14 @@ class AllDtosHybridTest extends TestCase
             'data' => [
                 'object' => [
                     'id' => 'ch_test_123',
-                    'amount' => 10000
-                ]
+                    'amount' => 10000,
+                ],
             ],
             'created' => 1704067200,
             'livemode' => false,
             'api_version' => '2024-01-01',
             'pending_webhooks' => 1,
-            'request' => ['id' => 'req_test_123']
+            'request' => ['id' => 'req_test_123'],
         ];
 
         $webhookEvent = WebhookEvent::fromArray($data);
@@ -311,7 +311,7 @@ class AllDtosHybridTest extends TestCase
         $this->assertSame('charge.succeeded', $webhookEvent->type->value);
         $this->assertSame('ch_test_123', $webhookEvent->data['object']['id']);
         $this->assertSame(1704067200, $webhookEvent->created);
-        
+
         // Array access
         $this->assertSame('evt_test_123', $webhookEvent['id']);
         $this->assertSame('charge.succeeded', $webhookEvent['type']);
@@ -331,7 +331,7 @@ class AllDtosHybridTest extends TestCase
             'livemode' => false,
             'created_at' => '2024-01-01T00:00:00Z',
             'updated_at' => '2024-01-01T00:00:00Z',
-            'metadata' => ['key' => 'value']
+            'metadata' => ['key' => 'value'],
         ];
 
         $dto = Source::fromArray($data);

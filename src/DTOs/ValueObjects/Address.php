@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Physical address information.
- * 
+ *
  * Used throughout the Magpie API for billing addresses, shipping addresses,
  * and other location-based data. Follows international address standards.
  */
@@ -25,7 +25,8 @@ class Address
         public readonly ?string $country = null,
         /** ZIP or postal code. */
         public readonly ?string $zip_code = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create an Address from an array.
@@ -54,6 +55,6 @@ class Address
             'state' => $this->state,
             'country' => $this->country,
             'zip_code' => $this->zip_code,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

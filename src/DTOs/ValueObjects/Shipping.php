@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Shipping information including address and recipient details.
- * 
+ *
  * Extends the base Address interface with shipping-specific fields
  * for delivery and recipient contact information.
  */
@@ -62,6 +62,6 @@ class Shipping extends Address
             'state' => $this->state,
             'country' => $this->country,
             'zip_code' => $this->zip_code,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

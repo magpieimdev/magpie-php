@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
-use Magpie\Exceptions\MagpieException;
-use Magpie\Http\Client;
+use Magpie\Contracts\PaymentRequestServiceInterface;
 use Magpie\DTOs\Requests\PaymentRequests\CreatePaymentRequestRequest;
 use Magpie\DTOs\Requests\PaymentRequests\VoidPaymentRequestRequest;
 use Magpie\DTOs\Responses\PaymentRequest;
-use Magpie\Contracts\PaymentRequestServiceInterface;
+use Magpie\Exceptions\MagpieException;
+use Magpie\Http\Client;
 
 /**
  * Resource class for managing payment requests.
@@ -79,14 +79,14 @@ class PaymentRequestsResource extends BaseResource implements PaymentRequestServ
     public function create(CreatePaymentRequestRequest|array $request, array $options = []): mixed
     {
         $requestData = is_array($request) ? $request : $request->toArray();
-        
+
         // Use custom base URL for payment requests
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->post($this->basePath, $requestData, $requestOptions);
-        
+
         return $this->createFromArray($data);
     }
 
@@ -104,10 +104,11 @@ class PaymentRequestsResource extends BaseResource implements PaymentRequestServ
     {
         // Use custom base URL for payment requests
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->get($this->buildPath($id), null, $requestOptions);
+
         return $this->createFromArray($data);
     }
 
@@ -128,10 +129,11 @@ class PaymentRequestsResource extends BaseResource implements PaymentRequestServ
     {
         // Use custom base URL for payment requests
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->request('POST', $this->buildPath($id, 'resend'), null, $requestOptions);
+
         return $this->createFromArray($data);
     }
 
@@ -141,9 +143,9 @@ class PaymentRequestsResource extends BaseResource implements PaymentRequestServ
      * Once voided, the customer will no longer be able to pay the request,
      * and any payment attempts will be rejected.
      *
-     * @param string                        $id      The unique identifier of the payment request to void
+     * @param string                          $id      The unique identifier of the payment request to void
      * @param VoidPaymentRequestRequest|array $request The void parameters or DTO
-     * @param array                         $options Additional request options
+     * @param array                           $options Additional request options
      *
      * @return mixed Voided payment request data
      *
@@ -152,20 +154,20 @@ class PaymentRequestsResource extends BaseResource implements PaymentRequestServ
     public function void(string $id, VoidPaymentRequestRequest|array $request, array $options = []): mixed
     {
         $requestData = is_array($request) ? $request : $request->toArray();
-        
+
         // Use custom base URL for payment requests
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $response = $this->client->request('POST', $this->buildPath($id, 'void'), $requestData, $requestOptions);
-        
+
         // Void API returns { message: string, data: PaymentRequest }
         // Extract the data property which contains the actual PaymentRequest
         if (is_array($response) && isset($response['data'])) {
             return $this->createFromArray($response['data']);
         }
-        
+
         // Fallback to direct response if structure is different
         return $this->createFromArray($response);
     }

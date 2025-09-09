@@ -89,7 +89,7 @@ class OrganizationResourceTest extends TestCase
         $this->assertSame('approved', $result['status']);
         $this->assertArrayHasKey('pk_test_key', $result);
         $this->assertArrayHasKey('pk_live_key', $result);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('organization', $result->object);
         $this->assertSame('org_test_123456789', $result->id);

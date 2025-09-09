@@ -10,5 +10,6 @@ class CaptureSessionRequest extends BaseRequest
 {
     public function __construct(
         public readonly int $amount
-    ) {}
+    ) {
+    }
 }

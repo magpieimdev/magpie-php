@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
+use Magpie\Contracts\WebhookServiceInterface;
+use Magpie\DTOs\Responses\WebhookEvent;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
-use Magpie\DTOs\Responses\WebhookEvent;
-use Magpie\Contracts\WebhookServiceInterface;
 
 /**
  * Webhooks resource for verifying and handling webhook events.

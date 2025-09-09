@@ -7,7 +7,6 @@ namespace Magpie\Tests\Unit\Resources;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
 use Magpie\Resources\PaymentRequestsResource;
-use Magpie\Tests\Unit\Resources\ChargesResourceTest;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -109,7 +108,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertSame(50000, $result['total']);
         $this->assertFalse($result['paid']);
         $this->assertSame('Jane Smith', $result['customer_name']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('pr_test_123', $result->id);
         $this->assertSame('payment_request', $result->object);
@@ -147,7 +146,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertSame('payment_request', $result['object']);
         $this->assertTrue($result['paid']);
         $this->assertSame(1641081600, $result['paid_at']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($requestId, $result->id);
         $this->assertSame('payment_request', $result->object);
@@ -185,7 +184,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertSame('payment_request', $result['object']);
         $this->assertArrayHasKey('resent_at', $result);
         $this->assertSame($resentTime, $result['resent_at']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($requestId, $result->id);
         $this->assertSame('payment_request', $result->object);
@@ -221,7 +220,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertTrue($result['voided']);
         $this->assertSame('duplicate_request', $result['void_reason']);
         $this->assertSame($voidTime, $result['voided_at']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($requestId, $result->id);
         $this->assertSame('payment_request', $result->object);
@@ -273,7 +272,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertSame('payment_request', $result['object']);
         $this->assertSame(25000, $result['total']);
         $this->assertSame('customer@example.com', $result['customer_email']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('pr_test_456', $result->id);
         $this->assertSame('payment_request', $result->object);
@@ -325,7 +324,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertSame('pr_test_789', $result['id']);
         $this->assertSame('payment_request', $result['object']);
         $this->assertSame(75000, $result['total']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('pr_test_789', $result->id);
         $this->assertSame('payment_request', $result->object);
@@ -398,7 +397,7 @@ class PaymentRequestsResourceTest extends TestCase
         $this->assertSame('payment_request', $result['object']);
         $this->assertTrue($result['voided']);
         $this->assertNull($result['void_reason']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($requestId, $result->id);
         $this->assertSame('payment_request', $result->object);

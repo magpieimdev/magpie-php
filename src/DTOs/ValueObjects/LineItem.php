@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Represents an individual item or service in a payment or invoice.
- * 
+ *
  * Line items are used in checkout sessions, payment links, and invoices
  * to describe the products or services being purchased.
  */
@@ -23,7 +23,8 @@ class LineItem
         public readonly ?string $description = null,
         /** The image of the line item. */
         public readonly ?string $image = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a LineItem from an array.
@@ -50,6 +51,6 @@ class LineItem
             'quantity' => $this->quantity,
             'description' => $this->description,
             'image' => $this->image,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

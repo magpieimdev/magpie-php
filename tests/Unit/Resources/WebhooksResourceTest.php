@@ -86,7 +86,7 @@ class WebhooksResourceTest extends TestCase
                     "amount": 10000
                 }
             },
-            "created": ' . time() . ',
+            "created": '.time().',
             "livemode": false
         }';
         $secret = 'whsec_test_secret';
@@ -103,7 +103,7 @@ class WebhooksResourceTest extends TestCase
         $this->assertSame('ch_test_123', $event->data['object']['id']);
         $this->assertSame(10000, $event->data['object']['amount']);
         $this->assertFalse($event->livemode);
-        
+
         // Test hybrid API - array access
         $this->assertSame('evt_test_webhook', $event['id']);
         $this->assertSame('charge.succeeded', $event['type']);
@@ -302,7 +302,7 @@ class WebhooksResourceTest extends TestCase
                     "amount": 5000
                 }
             },
-            "created": ' . time() . ',
+            "created": '.time().',
             "livemode": true
         }';
         $secret = 'whsec_custom_secret';
@@ -324,7 +324,7 @@ class WebhooksResourceTest extends TestCase
         $this->assertSame(\Magpie\Enums\WebhookEventType::CHARGE_SUCCEEDED, $event->type);
         $this->assertSame('ch_custom_456', $event->data['object']['id']);
         $this->assertTrue($event->livemode);
-        
+
         // Test hybrid API - array access
         $this->assertSame('evt_123', $event['id']);
         $this->assertSame('charge.succeeded', $event['type']);

@@ -27,24 +27,25 @@ class CreatePaymentLinkRequest extends BaseRequest
         public readonly ?string $redirect_url = null,
         public readonly ?bool $require_auth = null,
         public readonly ?ShippingAddressCollection $shipping_address_collection = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a CreatePaymentLinkRequest from an array with automatic conversion.
      */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         return new self(
             allow_adjustable_quantity: $data['allow_adjustable_quantity'],
             currency: $data['currency'],
             internal_name: $data['internal_name'],
             line_items: array_map(
-                fn($item) => is_array($item) ? PaymentLinkItem::fromArray($item) : $item,
+                fn ($item) => is_array($item) ? PaymentLinkItem::fromArray($item) : $item,
                 $data['line_items']
             ),
             payment_method_types: $data['payment_method_types'],
-            branding: isset($data['branding']) && is_array($data['branding']) 
-                ? BrandingOptions::fromArray($data['branding']) 
+            branding: isset($data['branding']) && is_array($data['branding'])
+                ? BrandingOptions::fromArray($data['branding'])
                 : $data['branding'] ?? null,
             description: $data['description'] ?? null,
             expiry: $data['expiry'] ?? null,

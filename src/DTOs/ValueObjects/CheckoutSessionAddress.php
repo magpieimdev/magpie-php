@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Address information collected during checkout.
- * 
+ *
  * Includes detailed address fields specific to Philippine
  * address format including barangay information.
  */
@@ -29,7 +29,8 @@ class CheckoutSessionAddress
         public readonly string $zip_code,
         /** The country of the address. */
         public readonly string $country
-    ) {}
+    ) {
+    }
 
     /**
      * Create a CheckoutSessionAddress from an array.
@@ -62,6 +63,6 @@ class CheckoutSessionAddress
             'state' => $this->state,
             'zip_code' => $this->zip_code,
             'country' => $this->country,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

@@ -38,26 +38,27 @@ class CreateCheckoutSessionRequest extends BaseRequest
         public readonly ?bool $require_auth = null,
         public readonly ?ShippingAddressCollection $shipping_address_collection = null,
         public readonly ?CheckoutSubmitType $submit_type = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a CreateCheckoutSessionRequest from an array with automatic conversion.
      */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
         return new self(
             cancel_url: $data['cancel_url'],
             currency: $data['currency'],
             line_items: array_map(
-                fn($item) => is_array($item) ? LineItem::fromArray($item) : $item,
+                fn ($item) => is_array($item) ? LineItem::fromArray($item) : $item,
                 $data['line_items']
             ),
             mode: $data['mode'],
             payment_method_types: $data['payment_method_types'],
             success_url: $data['success_url'],
             bank_code: $data['bank_code'] ?? null,
-            branding: isset($data['branding']) && is_array($data['branding']) 
-                ? BrandingOptions::fromArray($data['branding']) 
+            branding: isset($data['branding']) && is_array($data['branding'])
+                ? BrandingOptions::fromArray($data['branding'])
                 : $data['branding'] ?? null,
             billing_address_collection: isset($data['billing_address_collection']) && is_string($data['billing_address_collection'])
                 ? BillingAddressCollection::from($data['billing_address_collection'])

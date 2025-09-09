@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Delivery status for payment request notifications.
- * 
+ *
  * Tracks whether the payment request was successfully delivered
  * to the customer via different communication channels.
  */
@@ -17,7 +17,8 @@ class PaymentRequestDelivered
         public readonly bool $email,
         /** Whether the payment request was delivered to the customer via SMS. */
         public readonly bool $sms
-    ) {}
+    ) {
+    }
 
     /**
      * Create a PaymentRequestDelivered from an array.

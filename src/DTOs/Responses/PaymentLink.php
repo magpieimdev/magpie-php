@@ -33,5 +33,6 @@ class PaymentLink extends BaseResponse
         public readonly ?bool $phone_number_collection = null,
         public readonly ?string $redirect_url = null,
         public readonly ?ShippingAddressCollection $shipping_address_collection = null
-    ) {}
+    ) {
+    }
 }

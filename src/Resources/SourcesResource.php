@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
+use Magpie\Contracts\SourceServiceInterface;
+use Magpie\DTOs\Responses\Source;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
-use Magpie\DTOs\Responses\Source;
-use Magpie\Contracts\SourceServiceInterface;
 
 /**
  * Resource class for managing payment sources.
@@ -96,6 +96,7 @@ class SourcesResource extends BaseResource implements SourceServiceInterface
         $this->ensurePublicKeyAuthentication();
 
         $data = parent::retrieve($id, $options);
+
         return Source::fromArray($data);
     }
 

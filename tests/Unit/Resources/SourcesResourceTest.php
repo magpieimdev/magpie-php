@@ -86,14 +86,14 @@ class SourcesResourceTest extends TestCase
         $this->assertSame('card', $result['type']);
         $this->assertSame('4242', $result['card']['last4']);
         $this->assertSame('visa', $result['card']['brand']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($sourceId, $result->id);
         $this->assertSame('source', $result->object);
         $this->assertSame('card', $result->type->value);
         $this->assertSame('4242', $result->card->last4);
         $this->assertSame('visa', $result->card->brand);
-        
+
         // Note: Only last4 is exposed, never full card number for PCI compliance
         $this->assertArrayNotHasKey('number', $result['card']);
         $this->assertArrayNotHasKey('cvc', $result['card']);
@@ -168,7 +168,7 @@ class SourcesResourceTest extends TestCase
         $this->assertSame('card', $result['type']);
         $this->assertArrayHasKey('charges', $result);
         $this->assertSame('ch_123', $result['charges'][0]['id']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($sourceId, $result->id);
         $this->assertSame('source', $result->object);
@@ -230,7 +230,7 @@ class SourcesResourceTest extends TestCase
         $this->assertSame('gcash', $result['type']);
         $this->assertSame('https://example.com/success', $result['redirect']['success']);
         $this->assertSame('https://example.com/fail', $result['redirect']['fail']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($sourceId, $result->id);
         $this->assertSame('source', $result->object);

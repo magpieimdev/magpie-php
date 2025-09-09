@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Integration test for hybrid API functionality.
- * 
+ *
  * This test demonstrates that DTOs can be accessed both as objects (new way)
  * and as arrays (backward compatible way), fulfilling the hybrid API design.
  */
@@ -25,7 +25,7 @@ class HybridApiTest extends TestCase
             'type' => 'card',
             'redirect' => [
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
+                'fail' => 'https://example.com/fail',
             ],
             'vaulted' => true,
             'used' => false,
@@ -74,7 +74,7 @@ class HybridApiTest extends TestCase
             'type' => 'gcash',
             'redirect' => [
                 'success' => 'https://example.com/success',
-                'fail' => 'https://example.com/fail'
+                'fail' => 'https://example.com/fail',
             ],
             'vaulted' => false,
             'used' => true,

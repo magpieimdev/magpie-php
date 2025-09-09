@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
-use Magpie\Exceptions\MagpieException;
-use Magpie\Http\Client;
-use Magpie\DTOs\Requests\Charges\CreateChargeRequest;
+use Magpie\Contracts\ChargeServiceInterface;
 use Magpie\DTOs\Requests\Charges\CaptureChargeRequest;
+use Magpie\DTOs\Requests\Charges\CreateChargeRequest;
 use Magpie\DTOs\Requests\Charges\RefundChargeRequest;
 use Magpie\DTOs\Responses\Charge;
-use Magpie\Contracts\ChargeServiceInterface;
+use Magpie\Exceptions\MagpieException;
+use Magpie\Http\Client;
 
 /**
  * Resource class for managing charges and payments.
@@ -71,10 +71,12 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
     {
         if (is_array($request)) {
             $data = parent::create($request, $options);
+
             return $this->createFromArray($data);
         }
-        
+
         $data = parent::create($request->toArray(), $options);
+
         return $this->createFromArray($data);
     }
 
@@ -96,6 +98,7 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
     public function retrieve(string $id, array $options = []): mixed
     {
         $data = parent::retrieve($id, $options);
+
         return $this->createFromArray($data);
     }
 
@@ -105,9 +108,9 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
      * When you create a charge with `capture: false`, it will be authorized but not
      * captured. Use this method to capture the authorized amount (or a portion of it).
      *
-     * @param string                      $id      The unique identifier of the charge to capture
-     * @param CaptureChargeRequest|array  $request The capture parameters (amount, etc.) or DTO
-     * @param array                       $options Additional request options
+     * @param string                     $id      The unique identifier of the charge to capture
+     * @param CaptureChargeRequest|array $request The capture parameters (amount, etc.) or DTO
+     * @param array                      $options Additional request options
      *
      * @return array The updated charge data
      *
@@ -129,6 +132,7 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
     {
         $params = is_array($request) ? $request : $request->toArray();
         $data = $this->customResourceAction('POST', $id, 'capture', $params, $options);
+
         return $this->createFromArray($data);
     }
 
@@ -180,6 +184,7 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
     public function void(string $id, array $options = []): mixed
     {
         $data = $this->customResourceAction('POST', $id, 'void', null, $options);
+
         return $this->createFromArray($data);
     }
 
@@ -189,9 +194,9 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
      * Refunds can be created for the full charge amount or a partial amount.
      * The refund will be processed back to the original payment method.
      *
-     * @param string                     $id      The unique identifier of the charge to refund
-     * @param RefundChargeRequest|array  $request The refund parameters (amount, reason, etc.) or DTO
-     * @param array                      $options Additional request options
+     * @param string                    $id      The unique identifier of the charge to refund
+     * @param RefundChargeRequest|array $request The refund parameters (amount, reason, etc.) or DTO
+     * @param array                     $options Additional request options
      *
      * @return array The updated charge data with refund information
      *
@@ -217,6 +222,7 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
     {
         $params = is_array($request) ? $request : $request->toArray();
         $data = $this->customResourceAction('POST', $id, 'refund', $params, $options);
+
         return $this->createFromArray($data);
     }
 

@@ -6,9 +6,10 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Response data from the payment provider.
- * 
+ *
  * Contains raw response information from the underlying payment
  * processor for debugging and troubleshooting purposes.
+ *
  * @internal
  */
 class ChargeProviderResponse
@@ -22,7 +23,8 @@ class ChargeProviderResponse
         public readonly string $message,
         /** The provider response logref */
         public readonly string $logref
-    ) {}
+    ) {
+    }
 
     /**
      * Create a ChargeProviderResponse from an array.
@@ -31,7 +33,7 @@ class ChargeProviderResponse
     {
         return new self(
             links: array_map(
-                fn($link) => is_array($link) ? ChargeProviderResponseLink::fromArray($link) : $link,
+                fn ($link) => is_array($link) ? ChargeProviderResponseLink::fromArray($link) : $link,
                 $data['links'] ?? []
             ),
             code: $data['code'],
@@ -46,7 +48,7 @@ class ChargeProviderResponse
     public function toArray(): array
     {
         return [
-            'links' => array_map(fn($link) => $link->toArray(), $this->links),
+            'links' => array_map(fn ($link) => $link->toArray(), $this->links),
             'code' => $this->code,
             'message' => $this->message,
             'logref' => $this->logref,

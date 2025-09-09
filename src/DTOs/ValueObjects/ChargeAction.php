@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Action required to complete a charge (e.g., 3D Secure authentication).
- * 
+ *
  * Some charges require additional customer interaction to complete,
  * such as entering an OTP or completing 3D Secure authentication.
  */
@@ -17,7 +17,8 @@ class ChargeAction
         public readonly string $type,
         /** The action URL */
         public readonly string $url
-    ) {}
+    ) {
+    }
 
     /**
      * Create a ChargeAction from an array.

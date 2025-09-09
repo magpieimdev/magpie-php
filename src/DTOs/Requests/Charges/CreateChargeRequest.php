@@ -29,7 +29,7 @@ class CreateChargeRequest extends BaseRequest
             throw new \InvalidArgumentException('Amount must be greater than 0');
         }
 
-        if (strlen($this->currency) !== 3) {
+        if (3 !== strlen($this->currency)) {
             throw new \InvalidArgumentException('Currency must be a 3-letter ISO code');
         }
 

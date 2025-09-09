@@ -115,7 +115,7 @@ class CheckoutSessionsResourceTest extends TestCase
         $this->assertSame(25000, $result['amount_total']);
         $this->assertSame('unpaid', $result['payment_status']);
         $this->assertSame('customer@example.com', $result['customer_email']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('cs_test_123', $result->id);
         $this->assertSame('checkout.session', $result->object);
@@ -147,7 +147,7 @@ class CheckoutSessionsResourceTest extends TestCase
         $this->assertSame('checkout.session', $result['object']);
         $this->assertSame('paid', $result['payment_status']);
         $this->assertSame(25000, $result['amount_total']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($sessionId, $result->id);
         $this->assertSame('checkout.session', $result->object);
@@ -183,7 +183,7 @@ class CheckoutSessionsResourceTest extends TestCase
         $this->assertSame('checkout.session', $result['object']);
         $this->assertSame(20000, $result['amount_captured']);
         $this->assertSame('paid', $result['payment_status']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($sessionId, $result->id);
         $this->assertSame('checkout.session', $result->object);
@@ -214,7 +214,7 @@ class CheckoutSessionsResourceTest extends TestCase
         $this->assertSame($sessionId, $result['id']);
         $this->assertSame('checkout.session', $result['object']);
         $this->assertSame('expired', $result['payment_status']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($sessionId, $result->id);
         $this->assertSame('checkout.session', $result->object);
@@ -266,7 +266,7 @@ class CheckoutSessionsResourceTest extends TestCase
         $this->assertSame('cs_test_456', $result['id']);
         $this->assertSame('checkout.session', $result['object']);
         $this->assertSame(30000, $result['amount_total']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame('cs_test_456', $result->id);
         $this->assertSame('checkout.session', $result->object);

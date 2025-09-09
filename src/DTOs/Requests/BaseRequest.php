@@ -10,27 +10,29 @@ abstract class BaseRequest
     {
         $reflection = new \ReflectionClass(static::class);
         $constructor = $reflection->getConstructor();
-        
-        if (!$constructor) {
+
+        if (! $constructor) {
+            /* @var static */
             return new static();
         }
-        
+
         $parameters = $constructor->getParameters();
         $args = [];
-        
+
         foreach ($parameters as $parameter) {
             $key = $parameter->getName();
             $value = $data[$key] ?? null;
-            
-            if ($value !== null) {
+
+            if (null !== $value) {
                 $args[] = $value;
-            } else if ($parameter->isDefaultValueAvailable()) {
+            } elseif ($parameter->isDefaultValueAvailable()) {
                 $args[] = $parameter->getDefaultValue();
             } else {
                 $args[] = null;
             }
         }
-        
+
+        /* @var static */
         return new static(...$args);
     }
 
@@ -38,17 +40,17 @@ abstract class BaseRequest
     {
         $reflection = new \ReflectionClass($this);
         $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-        
+
         $data = [];
         foreach ($properties as $property) {
             $value = $property->getValue($this);
-            
-            if ($value !== null) {
+
+            if (null !== $value) {
                 $key = $this->convertPropertyName($property->getName());
                 $data[$key] = $this->convertValue($value);
             }
         }
-        
+
         return $data;
     }
 
@@ -62,20 +64,20 @@ abstract class BaseRequest
         if ($value instanceof \BackedEnum) {
             return $value->value;
         }
-        
+
         if ($value instanceof \DateTime) {
             return $value->getTimestamp();
         }
-        
+
         // Handle value objects with toArray() method
         if (is_object($value) && method_exists($value, 'toArray')) {
             return $value->toArray();
         }
-        
+
         if (is_array($value)) {
-            return array_map(fn($item) => $this->convertValue($item), $value);
+            return array_map(fn ($item) => $this->convertValue($item), $value);
         }
-        
+
         return $value;
     }
 }

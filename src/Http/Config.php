@@ -88,7 +88,7 @@ class Config
      */
     public function getApiUrl(): string
     {
-        return rtrim($this->baseUrl, '/').'/'.ltrim($this->apiVersion, '/') . '/';
+        return rtrim($this->baseUrl, '/').'/'.ltrim($this->apiVersion, '/').'/';
     }
 
     /**

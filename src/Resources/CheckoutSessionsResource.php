@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
+use Magpie\Contracts\CheckoutSessionServiceInterface;
+use Magpie\DTOs\Requests\Checkout\CaptureSessionRequest;
+use Magpie\DTOs\Requests\Checkout\CreateCheckoutSessionRequest;
+use Magpie\DTOs\Responses\CheckoutSession;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
-use Magpie\DTOs\Requests\Checkout\CreateCheckoutSessionRequest;
-use Magpie\DTOs\Requests\Checkout\CaptureSessionRequest;
-use Magpie\DTOs\Responses\CheckoutSession;
-use Magpie\Contracts\CheckoutSessionServiceInterface;
 
 /**
  * Resource class for managing checkout sessions.
@@ -82,14 +82,14 @@ class CheckoutSessionsResource extends BaseResource implements CheckoutSessionSe
     public function create(CreateCheckoutSessionRequest|array $request, array $options = []): mixed
     {
         $requestData = is_array($request) ? $request : $request->toArray();
-        
+
         // Use custom base URL for checkout sessions
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->post($this->basePath, $requestData, $requestOptions);
-        
+
         return $this->createFromArray($data);
     }
 
@@ -107,10 +107,11 @@ class CheckoutSessionsResource extends BaseResource implements CheckoutSessionSe
     {
         // Use custom base URL for checkout sessions
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->get($this->buildPath($id), null, $requestOptions);
+
         return $this->createFromArray($data);
     }
 
@@ -120,9 +121,9 @@ class CheckoutSessionsResource extends BaseResource implements CheckoutSessionSe
      * For sessions created with authorization-only payment methods,
      * this captures the authorized amount (or a portion of it).
      *
-     * @param string                     $id      The unique identifier of the checkout session
+     * @param string                      $id      The unique identifier of the checkout session
      * @param CaptureSessionRequest|array $request The capture parameters or DTO
-     * @param array                      $options Additional request options
+     * @param array                       $options Additional request options
      *
      * @return mixed Updated checkout session data
      *
@@ -131,14 +132,14 @@ class CheckoutSessionsResource extends BaseResource implements CheckoutSessionSe
     public function capture(string $id, CaptureSessionRequest|array $request, array $options = []): mixed
     {
         $requestData = is_array($request) ? $request : $request->toArray();
-        
+
         // Use custom base URL for checkout sessions
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->request('POST', $this->buildPath($id, 'capture'), $requestData, $requestOptions);
-        
+
         return $this->createFromArray($data);
     }
 
@@ -159,10 +160,11 @@ class CheckoutSessionsResource extends BaseResource implements CheckoutSessionSe
     {
         // Use custom base URL for checkout sessions
         $requestOptions = array_merge($options, [
-            'base_uri' => $this->customBaseUrl
+            'base_uri' => $this->customBaseUrl,
         ]);
-        
+
         $data = $this->client->request('POST', $this->buildPath($id, 'expire'), null, $requestOptions);
+
         return $this->createFromArray($data);
     }
 

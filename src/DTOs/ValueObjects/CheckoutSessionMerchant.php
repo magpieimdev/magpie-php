@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Merchant information displayed in the checkout session.
- * 
+ *
  * Contains business details shown to customers during checkout
  * for transparency and support purposes.
  */
@@ -19,7 +19,8 @@ class CheckoutSessionMerchant
         public readonly ?string $support_email,
         /** The support phone number of the merchant. */
         public readonly ?string $support_phone
-    ) {}
+    ) {
+    }
 
     /**
      * Create a CheckoutSessionMerchant from an array.
@@ -42,6 +43,6 @@ class CheckoutSessionMerchant
             'name' => $this->name,
             'support_email' => $this->support_email,
             'support_phone' => $this->support_phone,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

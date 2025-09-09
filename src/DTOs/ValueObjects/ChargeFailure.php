@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Information about a failed charge.
- * 
+ *
  * When a charge fails, this interface provides detailed information
  * about why it failed and suggested next steps for resolution.
  */
@@ -21,7 +21,8 @@ class ChargeFailure
         public readonly string $next_steps,
         /** The failure provider response */
         public readonly ChargeProviderResponse $provider_response
-    ) {}
+    ) {
+    }
 
     /**
      * Create a ChargeFailure from an array.

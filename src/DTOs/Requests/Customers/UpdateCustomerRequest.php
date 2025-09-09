@@ -14,5 +14,6 @@ class UpdateCustomerRequest extends BaseRequest
         public readonly ?string $mobile_number = null,
         public readonly ?string $description = null,
         public readonly ?array $metadata = null
-    ) {}
+    ) {
+    }
 }

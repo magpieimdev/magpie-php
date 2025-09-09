@@ -155,11 +155,12 @@ class ChargesResourceTest extends TestCase
             ->andReturn($expectedResponse);
 
         $result = $resource->retrieve($chargeId);
+        /* @var \Magpie\DTOs\Responses\Charge $result */
 
         // Test array access (backward compatibility)
         $this->assertSame($chargeId, $result['id']);
         $this->assertSame('succeeded', $result['status']);
-        
+
         // Test object access (new hybrid API)
         $this->assertSame($chargeId, $result->id);
         $this->assertSame('succeeded', $result->status->value);

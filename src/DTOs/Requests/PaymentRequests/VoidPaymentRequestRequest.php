@@ -10,5 +10,6 @@ class VoidPaymentRequestRequest extends BaseRequest
 {
     public function __construct(
         public readonly string $reason
-    ) {}
+    ) {
+    }
 }

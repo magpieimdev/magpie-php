@@ -25,5 +25,6 @@ class Organization extends BaseResponse
         public readonly array $payout_settings,
         public readonly array $metadata = [],
         public readonly ?string $business_address = null
-    ) {}
+    ) {
+    }
 }

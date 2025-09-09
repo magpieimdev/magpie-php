@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Redirect URLs for payment sources that require customer redirection.
- * 
+ *
  * Some payment methods require redirecting the customer to complete
  * the payment flow (e.g., online banking, e-wallets).
  */
@@ -19,7 +19,8 @@ class SourceRedirect
         public readonly string $fail,
         /** The URL that will be called repeatedly, until a proper response was received. Works like a payment webhook. */
         public readonly ?string $notify = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a SourceRedirect from an array.
@@ -42,6 +43,6 @@ class SourceRedirect
             'success' => $this->success,
             'fail' => $this->fail,
             'notify' => $this->notify,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

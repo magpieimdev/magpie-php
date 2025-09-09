@@ -6,7 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Billing information including address and contact details.
- * 
+ *
  * Extends the base Address interface with billing-specific fields
  * like name, phone, and email for payment processing.
  */
@@ -62,6 +62,6 @@ class Billing extends Address
             'state' => $this->state,
             'country' => $this->country,
             'zip_code' => $this->zip_code,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

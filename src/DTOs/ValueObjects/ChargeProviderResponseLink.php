@@ -6,6 +6,7 @@ namespace Magpie\DTOs\ValueObjects;
 
 /**
  * Link from payment provider response.
+ *
  * @internal
  */
 class ChargeProviderResponseLink
@@ -15,7 +16,8 @@ class ChargeProviderResponseLink
         public readonly string $href,
         /** The provider response link rel */
         public readonly string $rel
-    ) {}
+    ) {
+    }
 
     /**
      * Create a ChargeProviderResponseLink from an array.

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
+use Magpie\Contracts\OrganizationServiceInterface;
+use Magpie\DTOs\Responses\Organization;
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
-use Magpie\DTOs\Responses\Organization;
-use Magpie\Contracts\OrganizationServiceInterface;
 
 /**
  * Resource class for managing organization information.
@@ -38,6 +38,7 @@ class OrganizationResource extends BaseResource implements OrganizationServiceIn
     public function me(array $options = []): mixed
     {
         $data = $this->client->get($this->basePath, null, $options);
+
         return $this->createFromArray($data);
     }
 

@@ -34,5 +34,6 @@ class Charge extends BaseResponse
         public readonly string $updated_at,
         public readonly array $metadata = [],
         public readonly ?ChargeFailure $failure_data = null
-    ) {}
+    ) {
+    }
 }

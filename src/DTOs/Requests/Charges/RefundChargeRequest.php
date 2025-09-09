@@ -11,5 +11,6 @@ class RefundChargeRequest extends BaseRequest
     public function __construct(
         public readonly int $amount,
         public readonly string $reason
-    ) {}
+    ) {
+    }
 }

@@ -80,6 +80,7 @@ abstract class BaseResource
     protected function create(array $data, array $options = []): mixed
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->post($this->basePath, $data, $requestOptions);
     }
 
@@ -96,6 +97,7 @@ abstract class BaseResource
     protected function retrieve(string $id, array $options = []): mixed
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->get($this->buildPath($id), null, $requestOptions);
     }
 
@@ -113,6 +115,7 @@ abstract class BaseResource
     protected function update(string $id, array $data, array $options = []): mixed
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->put($this->buildPath($id), $data, $requestOptions);
     }
 
@@ -129,6 +132,7 @@ abstract class BaseResource
     protected function delete(string $id, array $options = []): mixed
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->delete($this->buildPath($id), null, $requestOptions);
     }
 
@@ -145,6 +149,7 @@ abstract class BaseResource
     protected function list(array $params = [], array $options = []): mixed
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->get($this->basePath, $params, $requestOptions);
     }
 
@@ -163,6 +168,7 @@ abstract class BaseResource
     protected function customAction(string $method, string $path, ?array $data = null, array $options = []): array
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->request($method, $path, $data, $requestOptions);
     }
 
@@ -182,6 +188,7 @@ abstract class BaseResource
     protected function customResourceAction(string $method, string $id, string $action, ?array $data = null, array $options = []): array
     {
         $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+
         return $this->client->request($method, $this->buildPath($id, $action), $data, $requestOptions);
     }
 

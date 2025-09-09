@@ -42,5 +42,6 @@ class PaymentRequest extends BaseResponse
         public readonly ?Charge $payment_details = null,
         public readonly ?int $voided_at = null,
         public readonly ?string $void_reason = null
-    ) {}
+    ) {
+    }
 }

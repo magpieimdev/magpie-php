@@ -100,17 +100,17 @@ class Client
     {
         // Create a clean handler stack to avoid any global middleware interference
         $stack = HandlerStack::create();
-        
+
         // Add retry middleware if needed
         if ($this->config->maxRetries > 0) {
             $stack->push($this->createRetryMiddleware());
         }
-        
+
         // Add logging middleware if debug is enabled
         if ($this->config->debug) {
             $stack->push($this->createLoggingMiddleware());
         }
-        
+
         return new GuzzleClient([
             'handler' => $stack,
             'base_uri' => $this->config->getApiUrl(),
@@ -263,7 +263,7 @@ class Client
                     'expand' => $options['expand'],
                 ]);
             }
-            
+
             // Handle custom base_uri if provided
             if (isset($options['base_uri'])) {
                 $requestOptions['base_uri'] = $options['base_uri'];
@@ -439,11 +439,12 @@ class Client
         try {
             // Ping endpoint is at base URL without version and returns plain text
             $response = $this->httpClient->request('GET', 'ping', [
-                'base_uri' => rtrim($this->config->baseUrl, '/') . '/',
+                'base_uri' => rtrim($this->config->baseUrl, '/').'/',
             ]);
-            
+
             $body = (string) $response->getBody();
-            return $body === 'healthy';
+
+            return 'healthy' === $body;
         } catch (\Exception $e) {
             return false;
         }

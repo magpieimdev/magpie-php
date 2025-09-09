@@ -44,7 +44,8 @@ class SourceCard
         public readonly ?string $address_country = null,
         /** The card billing address zip code. */
         public readonly ?string $address_zip = null
-    ) {}
+    ) {
+    }
 
     /**
      * Create a SourceCard from an array.
@@ -95,6 +96,6 @@ class SourceCard
             'address_state' => $this->address_state,
             'address_country' => $this->address_country,
             'address_zip' => $this->address_zip,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => null !== $value);
     }
 }

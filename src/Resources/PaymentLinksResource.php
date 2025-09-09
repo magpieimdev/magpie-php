@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Magpie\Resources;
 
-use Magpie\Exceptions\MagpieException;
-use Magpie\Http\Client;
+use Magpie\Contracts\PaymentLinkServiceInterface;
 use Magpie\DTOs\Requests\PaymentLinks\CreatePaymentLinkRequest;
 use Magpie\DTOs\Requests\PaymentLinks\UpdatePaymentLinkRequest;
 use Magpie\DTOs\Responses\PaymentLink;
-use Magpie\Contracts\PaymentLinkServiceInterface;
+use Magpie\Exceptions\MagpieException;
+use Magpie\Http\Client;
 
 /**
  * Resource class for managing payment links.
@@ -36,8 +36,8 @@ class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInt
      * Payment links provide a hosted payment page accessible via a shareable URL.
      * No coding required - perfect for social media, email campaigns, or instant invoicing.
      *
-     * @param CreatePaymentLinkRequest|array $request  Payment link creation parameters or DTO
-     * @param array                          $options  Additional request options
+     * @param CreatePaymentLinkRequest|array $request Payment link creation parameters or DTO
+     * @param array                          $options Additional request options
      *
      * @return mixed Created payment link data
      *
@@ -83,7 +83,7 @@ class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInt
         } else {
             $data = parent::create($request->toArray(), $options);
         }
-        
+
         return $this->createFromArray($data);
     }
 
@@ -100,6 +100,7 @@ class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInt
     public function retrieve(string $id, array $options = []): mixed
     {
         $data = parent::retrieve($id, $options);
+
         return $this->createFromArray($data);
     }
 
@@ -121,7 +122,7 @@ class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInt
         } else {
             $data = parent::update($id, $request->toArray(), $options);
         }
-        
+
         return $this->createFromArray($data);
     }
 
@@ -138,6 +139,7 @@ class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInt
     public function activate(string $id, array $options = []): mixed
     {
         $data = $this->customResourceAction('POST', $id, 'activate', null, $options);
+
         return $this->createFromArray($data);
     }
 
@@ -157,6 +159,7 @@ class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInt
     public function deactivate(string $id, array $options = []): mixed
     {
         $data = $this->customResourceAction('POST', $id, 'deactivate', null, $options);
+
         return $this->createFromArray($data);
     }
 
