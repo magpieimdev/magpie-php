@@ -8,6 +8,8 @@ use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
 use Magpie\DTOs\Requests\Checkout\CreateCheckoutSessionRequest;
 use Magpie\DTOs\Requests\Checkout\CaptureSessionRequest;
+use Magpie\DTOs\Responses\CheckoutSession;
+use Magpie\Contracts\CheckoutSessionServiceInterface;
 
 /**
  * Resource class for managing checkout sessions.
@@ -16,7 +18,7 @@ use Magpie\DTOs\Requests\Checkout\CaptureSessionRequest;
  * securely enter their payment information. Sessions can be configured
  * with line items, branding, and redirect URLs for success/cancel scenarios.
  */
-class CheckoutSessionsResource extends BaseResource
+class CheckoutSessionsResource extends BaseResource implements CheckoutSessionServiceInterface
 {
     /**
      * Create a new CheckoutSessionsResource instance.
@@ -25,8 +27,8 @@ class CheckoutSessionsResource extends BaseResource
      */
     public function __construct(Client $client)
     {
-        // Use different base URL for checkout sessions
-        parent::__construct($client, '', 'https://api.pay.magpie.im');
+        // Use different base URL for checkout sessions with trailing slash
+        parent::__construct($client, '', 'https://api.pay.magpie.im/');
     }
 
     /**
@@ -38,7 +40,7 @@ class CheckoutSessionsResource extends BaseResource
      * @param CreateCheckoutSessionRequest|array $request Checkout session creation parameters or DTO
      * @param array                              $options Additional request options
      *
-     * @return array Created checkout session data
+     * @return mixed Created checkout session data
      *
      * @throws MagpieException
      *
@@ -77,13 +79,18 @@ class CheckoutSessionsResource extends BaseResource
      * header('Location: ' . $session['url']);
      * ```
      */
-    public function create(CreateCheckoutSessionRequest|array $request, array $options = []): array
+    public function create(CreateCheckoutSessionRequest|array $request, array $options = []): mixed
     {
-        if (is_array($request)) {
-            return parent::create($request, $options);
-        }
+        $requestData = is_array($request) ? $request : $request->toArray();
         
-        return parent::create($request->toArray(), $options);
+        // Use custom base URL for checkout sessions
+        $requestOptions = array_merge($options, [
+            'base_uri' => $this->customBaseUrl
+        ]);
+        
+        $data = $this->client->post($this->basePath, $requestData, $requestOptions);
+        
+        return $this->createFromArray($data);
     }
 
     /**
@@ -92,13 +99,19 @@ class CheckoutSessionsResource extends BaseResource
      * @param string $id      The unique identifier of the checkout session
      * @param array  $options Additional request options
      *
-     * @return array Checkout session data
+     * @return mixed Checkout session data
      *
      * @throws MagpieException
      */
-    public function retrieve(string $id, array $options = []): array
+    public function retrieve(string $id, array $options = []): mixed
     {
-        return parent::retrieve($id, $options);
+        // Use custom base URL for checkout sessions
+        $requestOptions = array_merge($options, [
+            'base_uri' => $this->customBaseUrl
+        ]);
+        
+        $data = $this->client->get($this->buildPath($id), null, $requestOptions);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -111,17 +124,22 @@ class CheckoutSessionsResource extends BaseResource
      * @param CaptureSessionRequest|array $request The capture parameters or DTO
      * @param array                      $options Additional request options
      *
-     * @return array Updated checkout session data
+     * @return mixed Updated checkout session data
      *
      * @throws MagpieException
      */
-    public function capture(string $id, CaptureSessionRequest|array $request, array $options = []): array
+    public function capture(string $id, CaptureSessionRequest|array $request, array $options = []): mixed
     {
-        if (is_array($request)) {
-            return $this->customResourceAction('POST', $id, 'capture', $request, $options);
-        }
+        $requestData = is_array($request) ? $request : $request->toArray();
         
-        return $this->customResourceAction('POST', $id, 'capture', $request->toArray(), $options);
+        // Use custom base URL for checkout sessions
+        $requestOptions = array_merge($options, [
+            'base_uri' => $this->customBaseUrl
+        ]);
+        
+        $data = $this->client->request('POST', $this->buildPath($id, 'capture'), $requestData, $requestOptions);
+        
+        return $this->createFromArray($data);
     }
 
     /**
@@ -133,12 +151,23 @@ class CheckoutSessionsResource extends BaseResource
      * @param string $id      The unique identifier of the checkout session to expire
      * @param array  $options Additional request options
      *
-     * @return array Expired checkout session data
+     * @return mixed Expired checkout session data
      *
      * @throws MagpieException
      */
-    public function expire(string $id, array $options = []): array
+    public function expire(string $id, array $options = []): mixed
     {
-        return $this->customResourceAction('POST', $id, 'expire', null, $options);
+        // Use custom base URL for checkout sessions
+        $requestOptions = array_merge($options, [
+            'base_uri' => $this->customBaseUrl
+        ]);
+        
+        $data = $this->client->request('POST', $this->buildPath($id, 'expire'), null, $requestOptions);
+        return $this->createFromArray($data);
+    }
+
+    protected function createFromArray(array $data): CheckoutSession
+    {
+        return CheckoutSession::fromArray($data);
     }
 }

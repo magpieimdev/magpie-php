@@ -6,6 +6,8 @@ namespace Magpie\Resources;
 
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
+use Magpie\DTOs\Responses\WebhookEvent;
+use Magpie\Contracts\WebhookServiceInterface;
 
 /**
  * Webhooks resource for verifying and handling webhook events.
@@ -13,7 +15,7 @@ use Magpie\Http\Client;
  * This class provides methods to verify webhook signatures and construct
  * verified webhook events from incoming HTTP requests.
  */
-class WebhooksResource extends BaseResource
+class WebhooksResource extends BaseResource implements WebhookServiceInterface
 {
     /**
      * Default configuration for webhook signature verification.
@@ -109,7 +111,7 @@ class WebhooksResource extends BaseResource
         string $signature,
         string $secret,
         array $config = []
-    ): array {
+    ): mixed {
         if (! $this->verifySignature($payload, $signature, $secret, $config)) {
             throw new MagpieException('Invalid webhook signature', 'webhook_error');
         }
@@ -120,7 +122,7 @@ class WebhooksResource extends BaseResource
             throw new MagpieException('Invalid JSON in webhook payload', 'webhook_error', previous: $e);
         }
 
-        return $event;
+        return $this->createFromArray($event);
     }
 
     /**
@@ -250,5 +252,10 @@ class WebhooksResource extends BaseResource
         $value = $headers[$name] ?? $headers[strtolower($name)] ?? null;
 
         return is_array($value) ? $value[0] : $value;
+    }
+
+    protected function createFromArray(array $data): WebhookEvent
+    {
+        return WebhookEvent::fromArray($data);
     }
 }

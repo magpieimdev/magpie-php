@@ -8,6 +8,8 @@ use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
 use Magpie\DTOs\Requests\PaymentLinks\CreatePaymentLinkRequest;
 use Magpie\DTOs\Requests\PaymentLinks\UpdatePaymentLinkRequest;
+use Magpie\DTOs\Responses\PaymentLink;
+use Magpie\Contracts\PaymentLinkServiceInterface;
 
 /**
  * Resource class for managing payment links.
@@ -16,7 +18,7 @@ use Magpie\DTOs\Requests\PaymentLinks\UpdatePaymentLinkRequest;
  * customers without building a custom checkout flow. They can be sent via
  * email, SMS, or shared on social media.
  */
-class PaymentLinksResource extends BaseResource
+class PaymentLinksResource extends BaseResource implements PaymentLinkServiceInterface
 {
     /**
      * Create a new PaymentLinksResource instance.
@@ -25,7 +27,7 @@ class PaymentLinksResource extends BaseResource
      */
     public function __construct(Client $client)
     {
-        parent::__construct($client, 'links', 'https://buy.magpie.im/api/v1');
+        parent::__construct($client, 'links', 'https://buy.magpie.im/api/v1/');
     }
 
     /**
@@ -37,7 +39,7 @@ class PaymentLinksResource extends BaseResource
      * @param CreatePaymentLinkRequest|array $request  Payment link creation parameters or DTO
      * @param array                          $options  Additional request options
      *
-     * @return array Created payment link data
+     * @return mixed Created payment link data
      *
      * @throws MagpieException
      *
@@ -74,13 +76,15 @@ class PaymentLinksResource extends BaseResource
      * $paymentLink = $magpie->paymentLinks->create($request);
      * ```
      */
-    public function create(CreatePaymentLinkRequest|array $request, array $options = []): array
+    public function create(CreatePaymentLinkRequest|array $request, array $options = []): mixed
     {
         if (is_array($request)) {
-            return parent::create($request, $options);
+            $data = parent::create($request, $options);
+        } else {
+            $data = parent::create($request->toArray(), $options);
         }
         
-        return parent::create($request->toArray(), $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -89,13 +93,14 @@ class PaymentLinksResource extends BaseResource
      * @param string $id      The unique identifier of the payment link
      * @param array  $options Additional request options
      *
-     * @return array Payment link data
+     * @return mixed Payment link data
      *
      * @throws MagpieException
      */
-    public function retrieve(string $id, array $options = []): array
+    public function retrieve(string $id, array $options = []): mixed
     {
-        return parent::retrieve($id, $options);
+        $data = parent::retrieve($id, $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -105,17 +110,19 @@ class PaymentLinksResource extends BaseResource
      * @param UpdatePaymentLinkRequest|array $request The update parameters or DTO
      * @param array                          $options Additional request options
      *
-     * @return array Updated payment link data
+     * @return mixed Updated payment link data
      *
      * @throws MagpieException
      */
-    public function update(string $id, UpdatePaymentLinkRequest|array $request, array $options = []): array
+    public function update(string $id, UpdatePaymentLinkRequest|array $request, array $options = []): mixed
     {
         if (is_array($request)) {
-            return parent::update($id, $request, $options);
+            $data = parent::update($id, $request, $options);
+        } else {
+            $data = parent::update($id, $request->toArray(), $options);
         }
         
-        return parent::update($id, $request->toArray(), $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -124,13 +131,14 @@ class PaymentLinksResource extends BaseResource
      * @param string $id      The unique identifier of the payment link to activate
      * @param array  $options Additional request options
      *
-     * @return array Activated payment link data
+     * @return mixed Activated payment link data
      *
      * @throws MagpieException
      */
-    public function activate(string $id, array $options = []): array
+    public function activate(string $id, array $options = []): mixed
     {
-        return $this->customResourceAction('POST', $id, 'activate', null, $options);
+        $data = $this->customResourceAction('POST', $id, 'activate', null, $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -142,12 +150,18 @@ class PaymentLinksResource extends BaseResource
      * @param string $id      The unique identifier of the payment link to deactivate
      * @param array  $options Additional request options
      *
-     * @return array Deactivated payment link data
+     * @return mixed Deactivated payment link data
      *
      * @throws MagpieException
      */
-    public function deactivate(string $id, array $options = []): array
+    public function deactivate(string $id, array $options = []): mixed
     {
-        return $this->customResourceAction('POST', $id, 'deactivate', null, $options);
+        $data = $this->customResourceAction('POST', $id, 'deactivate', null, $options);
+        return $this->createFromArray($data);
+    }
+
+    protected function createFromArray(array $data): PaymentLink
+    {
+        return PaymentLink::fromArray($data);
     }
 }

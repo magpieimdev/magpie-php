@@ -9,6 +9,8 @@ use Magpie\Http\Client;
 use Magpie\DTOs\Requests\Charges\CreateChargeRequest;
 use Magpie\DTOs\Requests\Charges\CaptureChargeRequest;
 use Magpie\DTOs\Requests\Charges\RefundChargeRequest;
+use Magpie\DTOs\Responses\Charge;
+use Magpie\Contracts\ChargeServiceInterface;
 
 /**
  * Resource class for managing charges and payments.
@@ -17,7 +19,7 @@ use Magpie\DTOs\Requests\Charges\RefundChargeRequest;
  * in the Magpie payment system. This includes creating new charges, capturing
  * authorized payments, processing refunds, and verifying payment authenticity.
  */
-class ChargesResource extends BaseResource
+class ChargesResource extends BaseResource implements ChargeServiceInterface
 {
     /**
      * Create a new ChargesResource instance.
@@ -65,13 +67,15 @@ class ChargesResource extends BaseResource
      * $charge = $magpie->charges->create($request);
      * ```
      */
-    public function create(CreateChargeRequest|array $request, array $options = []): array
+    public function create(CreateChargeRequest|array $request, array $options = []): mixed
     {
         if (is_array($request)) {
-            return parent::create($request, $options);
+            $data = parent::create($request, $options);
+            return $this->createFromArray($data);
         }
         
-        return parent::create($request->toArray(), $options);
+        $data = parent::create($request->toArray(), $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -89,9 +93,10 @@ class ChargesResource extends BaseResource
      * $charge = $magpie->charges->retrieve('ch_1234567890');
      * ```
      */
-    public function retrieve(string $id, array $options = []): array
+    public function retrieve(string $id, array $options = []): mixed
     {
-        return parent::retrieve($id, $options);
+        $data = parent::retrieve($id, $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -120,10 +125,11 @@ class ChargesResource extends BaseResource
      * $captured = $magpie->charges->capture('ch_1234567890', $request);
      * ```
      */
-    public function capture(string $id, CaptureChargeRequest|array $request, array $options = []): array
+    public function capture(string $id, CaptureChargeRequest|array $request, array $options = []): mixed
     {
         $params = is_array($request) ? $request : $request->toArray();
-        return $this->customResourceAction('POST', $id, 'capture', $params, $options);
+        $data = $this->customResourceAction('POST', $id, 'capture', $params, $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -171,9 +177,10 @@ class ChargesResource extends BaseResource
      * $voided = $magpie->charges->void('ch_1234567890');
      * ```
      */
-    public function void(string $id, array $options = []): array
+    public function void(string $id, array $options = []): mixed
     {
-        return $this->customResourceAction('POST', $id, 'void', null, $options);
+        $data = $this->customResourceAction('POST', $id, 'void', null, $options);
+        return $this->createFromArray($data);
     }
 
     /**
@@ -206,9 +213,15 @@ class ChargesResource extends BaseResource
      * $refunded = $magpie->charges->refund('ch_1234567890', $request);
      * ```
      */
-    public function refund(string $id, RefundChargeRequest|array $request, array $options = []): array
+    public function refund(string $id, RefundChargeRequest|array $request, array $options = []): mixed
     {
         $params = is_array($request) ? $request : $request->toArray();
-        return $this->customResourceAction('POST', $id, 'refund', $params, $options);
+        $data = $this->customResourceAction('POST', $id, 'refund', $params, $options);
+        return $this->createFromArray($data);
+    }
+
+    protected function createFromArray(array $data): Charge
+    {
+        return Charge::fromArray($data);
     }
 }

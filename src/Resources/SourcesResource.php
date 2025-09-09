@@ -6,6 +6,8 @@ namespace Magpie\Resources;
 
 use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
+use Magpie\DTOs\Responses\Source;
+use Magpie\Contracts\SourceServiceInterface;
 
 /**
  * Resource class for managing payment sources.
@@ -19,7 +21,7 @@ use Magpie\Http\Client;
  * Note: This resource automatically switches from secret key to public key authentication
  * for accessing source data.
  */
-class SourcesResource extends BaseResource
+class SourcesResource extends BaseResource implements SourceServiceInterface
 {
     /**
      * Whether PK authentication has been initialized.
@@ -84,15 +86,21 @@ class SourcesResource extends BaseResource
      * @param string $id      The unique identifier of the source
      * @param array  $options Additional request options
      *
-     * @return array Source data
+     * @return Source Source data
      *
      * @throws MagpieException
      */
-    public function retrieve(string $id, array $options = []): array
+    public function retrieve(string $id, array $options = []): mixed
     {
         $this->ensurePKAuthentication();
         $this->ensurePublicKeyAuthentication();
 
-        return parent::retrieve($id, $options);
+        $data = parent::retrieve($id, $options);
+        return Source::fromArray($data);
+    }
+
+    protected function createFromArray(array $data): Source
+    {
+        return Source::fromArray($data);
     }
 }

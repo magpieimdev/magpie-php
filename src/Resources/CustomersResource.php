@@ -8,6 +8,8 @@ use Magpie\Exceptions\MagpieException;
 use Magpie\Http\Client;
 use Magpie\DTOs\Requests\Customers\CreateCustomerRequest;
 use Magpie\DTOs\Requests\Customers\UpdateCustomerRequest;
+use Magpie\DTOs\Responses\Customer;
+use Magpie\Contracts\CustomerServiceInterface;
 
 /**
  * Resource class for managing customers.
@@ -16,7 +18,7 @@ use Magpie\DTOs\Requests\Customers\UpdateCustomerRequest;
  * records in the Magpie payment system. Customers can have attached payment sources
  * and can be used for recurring billing and payment history tracking.
  */
-class CustomersResource extends BaseResource
+class CustomersResource extends BaseResource implements CustomerServiceInterface
 {
     public function __construct(Client $client)
     {
@@ -29,7 +31,7 @@ class CustomersResource extends BaseResource
      * @param CreateCustomerRequest|array $request  Customer creation parameters or DTO
      * @param array                       $options  Additional request options
      *
-     * @return array Created customer data
+     * @return Customer Created customer data
      *
      * @throws MagpieException
      *
@@ -53,17 +55,19 @@ class CustomersResource extends BaseResource
      * $customer = $magpie->customers->create($request);
      * ```
      */
-    public function create(CreateCustomerRequest|array $request, array $options = []): array
+    public function create(CreateCustomerRequest|array $request, array $options = []): mixed
     {
         if (is_array($request)) {
             $transformedRequest = $this->transformCustomerPayload($request);
             $customer = parent::create($transformedRequest, $options);
-            return $this->transformCustomerResponse($customer);
+            $transformedCustomer = $this->transformCustomerResponse($customer);
+            return $this->createFromArray($transformedCustomer);
         }
         
         $transformedRequest = $this->transformCustomerPayload($request->toArray());
         $customer = parent::create($transformedRequest, $options);
-        return $this->transformCustomerResponse($customer);
+        $transformedCustomer = $this->transformCustomerResponse($customer);
+        return $this->createFromArray($transformedCustomer);
     }
 
     /**
@@ -72,14 +76,15 @@ class CustomersResource extends BaseResource
      * @param string $id      Customer ID
      * @param array  $options Additional request options
      *
-     * @return array Customer data
+     * @return Customer Customer data
      *
      * @throws MagpieException
      */
-    public function retrieve(string $id, array $options = []): array
+    public function retrieve(string $id, array $options = []): mixed
     {
         $customer = parent::retrieve($id, $options);
-        return $this->transformCustomerResponse($customer);
+        $transformedCustomer = $this->transformCustomerResponse($customer);
+        return $this->createFromArray($transformedCustomer);
     }
 
     /**
@@ -89,21 +94,23 @@ class CustomersResource extends BaseResource
      * @param UpdateCustomerRequest|array $request Update parameters or DTO
      * @param array                       $options Additional request options
      *
-     * @return array Updated customer data
+     * @return Customer Updated customer data
      *
      * @throws MagpieException
      */
-    public function update(string $id, UpdateCustomerRequest|array $request, array $options = []): array
+    public function update(string $id, UpdateCustomerRequest|array $request, array $options = []): mixed
     {
         if (is_array($request)) {
             $transformedRequest = $this->transformCustomerPayload($request);
             $customer = parent::update($id, $transformedRequest, $options);
-            return $this->transformCustomerResponse($customer);
+            $transformedCustomer = $this->transformCustomerResponse($customer);
+            return $this->createFromArray($transformedCustomer);
         }
         
         $transformedRequest = $this->transformCustomerPayload($request->toArray());
         $customer = parent::update($id, $transformedRequest, $options);
-        return $this->transformCustomerResponse($customer);
+        $transformedCustomer = $this->transformCustomerResponse($customer);
+        return $this->createFromArray($transformedCustomer);
     }
 
     /**
@@ -112,7 +119,7 @@ class CustomersResource extends BaseResource
      * @param string $email   The email address of the customer
      * @param array  $options Additional request options
      *
-     * @return array Customer data
+     * @return Customer Customer data
      *
      * @throws MagpieException
      *
@@ -121,10 +128,11 @@ class CustomersResource extends BaseResource
      * $customer = $magpie->customers->retrieveByEmail('john@example.com');
      * ```
      */
-    public function retrieveByEmail(string $email, array $options = []): array
+    public function retrieveByEmail(string $email, array $options = []): mixed
     {
         $customer = $this->customAction('GET', $this->buildPath().'/by_email/'.$email, null, $options);
-        return $this->transformCustomerResponse($customer);
+        $transformedCustomer = $this->transformCustomerResponse($customer);
+        return $this->createFromArray($transformedCustomer);
     }
 
     /**
@@ -134,7 +142,7 @@ class CustomersResource extends BaseResource
      * @param string $source  The ID of the payment source to attach
      * @param array  $options Additional request options
      *
-     * @return array Updated customer data
+     * @return Customer Updated customer data
      *
      * @throws MagpieException
      *
@@ -146,10 +154,11 @@ class CustomersResource extends BaseResource
      * );
      * ```
      */
-    public function attachSource(string $id, string $source, array $options = []): array
+    public function attachSource(string $id, string $source, array $options = []): mixed
     {
         $customer = $this->customResourceAction('POST', $id, 'sources', ['source' => $source], $options);
-        return $this->transformCustomerResponse($customer);
+        $transformedCustomer = $this->transformCustomerResponse($customer);
+        return $this->createFromArray($transformedCustomer);
     }
 
     /**
@@ -159,7 +168,7 @@ class CustomersResource extends BaseResource
      * @param string $source  The ID of the payment source to detach
      * @param array  $options Additional request options
      *
-     * @return array Updated customer data
+     * @return Customer Updated customer data
      *
      * @throws MagpieException
      *
@@ -171,10 +180,11 @@ class CustomersResource extends BaseResource
      * );
      * ```
      */
-    public function detachSource(string $id, string $source, array $options = []): array
+    public function detachSource(string $id, string $source, array $options = []): mixed
     {
         $customer = $this->customAction('DELETE', $this->buildPath($id, "sources/{$source}"), null, $options);
-        return $this->transformCustomerResponse($customer);
+        $transformedCustomer = $this->transformCustomerResponse($customer);
+        return $this->createFromArray($transformedCustomer);
     }
 
     /**
@@ -213,5 +223,10 @@ class CustomersResource extends BaseResource
         }
 
         return $response;
+    }
+
+    protected function createFromArray(array $data): Customer
+    {
+        return Customer::fromArray($data);
     }
 }
