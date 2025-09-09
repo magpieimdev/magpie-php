@@ -10,11 +10,11 @@ use Magpie\DTOs\Responses\PaymentRequest;
 
 interface PaymentRequestServiceInterface
 {
-    public function create(CreatePaymentRequestRequest|array $request): PaymentRequest;
+    public function create(CreatePaymentRequestRequest|array $request, array $options = []): mixed;
     
-    public function retrieve(string $id): PaymentRequest;
+    public function retrieve(string $id, array $options = []): mixed;
     
-    public function resend(string $id): PaymentRequest;
+    public function resend(string $id, array $options = []): mixed;
     
-    public function void(string $id, VoidPaymentRequestRequest|array $request): PaymentRequest;
+    public function void(string $id, VoidPaymentRequestRequest|array $request, array $options = []): mixed;
 }

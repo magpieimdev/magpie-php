@@ -10,11 +10,11 @@ use Magpie\DTOs\Responses\CheckoutSession;
 
 interface CheckoutSessionServiceInterface
 {
-    public function create(CreateCheckoutSessionRequest|array $request): CheckoutSession;
+    public function create(CreateCheckoutSessionRequest|array $request, array $options = []): mixed;
     
-    public function retrieve(string $id): CheckoutSession;
+    public function retrieve(string $id, array $options = []): mixed;
     
-    public function capture(string $id, CaptureSessionRequest|array $request): CheckoutSession;
+    public function capture(string $id, CaptureSessionRequest|array $request, array $options = []): mixed;
     
-    public function expire(string $id): CheckoutSession;
+    public function expire(string $id, array $options = []): mixed;
 }

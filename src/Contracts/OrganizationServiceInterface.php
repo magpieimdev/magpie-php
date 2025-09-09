@@ -8,5 +8,5 @@ use Magpie\DTOs\Responses\Organization;
 
 interface OrganizationServiceInterface
 {
-    public function me(): Organization;
+    public function me(array $options = []): mixed;
 }

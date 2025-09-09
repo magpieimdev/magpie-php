@@ -11,13 +11,13 @@ use Magpie\DTOs\Responses\Charge;
 
 interface ChargeServiceInterface
 {
-    public function create(CreateChargeRequest|array $request): Charge;
+    public function create(CreateChargeRequest|array $request, array $options = []): mixed;
     
-    public function retrieve(string $id): Charge;
+    public function retrieve(string $id, array $options = []): mixed;
     
-    public function capture(string $id, CaptureChargeRequest|array $request): Charge;
+    public function capture(string $id, CaptureChargeRequest|array $request, array $options = []): mixed;
     
-    public function refund(string $id, RefundChargeRequest|array $request): Charge;
+    public function refund(string $id, RefundChargeRequest|array $request, array $options = []): mixed;
     
-    public function void(string $id): Charge;
+    public function void(string $id, array $options = []): mixed;
 }

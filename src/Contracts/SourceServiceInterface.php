@@ -8,5 +8,5 @@ use Magpie\DTOs\Responses\Source;
 
 interface SourceServiceInterface
 {
-    public function retrieve(string $id): Source;
+    public function retrieve(string $id, array $options = []): mixed;
 }

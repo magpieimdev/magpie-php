@@ -10,15 +10,15 @@ use Magpie\DTOs\Responses\Customer;
 
 interface CustomerServiceInterface
 {
-    public function create(CreateCustomerRequest|array $request): Customer;
+    public function create(CreateCustomerRequest|array $request, array $options = []): mixed;
     
-    public function retrieve(string $id): Customer;
+    public function retrieve(string $id, array $options = []): mixed;
     
-    public function update(string $id, UpdateCustomerRequest|array $request): Customer;
+    public function update(string $id, UpdateCustomerRequest|array $request, array $options = []): mixed;
     
-    public function retrieveByEmail(string $email): Customer;
+    public function retrieveByEmail(string $email, array $options = []): mixed;
     
-    public function attachSource(string $customerId, string $sourceId): Customer;
+    public function attachSource(string $customerId, string $sourceId, array $options = []): mixed;
     
-    public function detachSource(string $customerId, string $sourceId): Customer;
+    public function detachSource(string $customerId, string $sourceId, array $options = []): mixed;
 }

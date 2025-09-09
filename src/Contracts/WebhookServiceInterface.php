@@ -12,5 +12,5 @@ interface WebhookServiceInterface
         string $payload,
         string $signature,
         string $secret
-    ): WebhookEvent;
+    ): mixed;
 }

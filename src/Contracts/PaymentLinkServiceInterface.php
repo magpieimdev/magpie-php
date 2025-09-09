@@ -10,13 +10,13 @@ use Magpie\DTOs\Responses\PaymentLink;
 
 interface PaymentLinkServiceInterface
 {
-    public function create(CreatePaymentLinkRequest|array $request): PaymentLink;
+    public function create(CreatePaymentLinkRequest|array $request, array $options = []): mixed;
     
-    public function retrieve(string $id): PaymentLink;
+    public function retrieve(string $id, array $options = []): mixed;
     
-    public function update(string $id, UpdatePaymentLinkRequest|array $request): PaymentLink;
+    public function update(string $id, UpdatePaymentLinkRequest|array $request, array $options = []): mixed;
     
-    public function activate(string $id): PaymentLink;
+    public function activate(string $id, array $options = []): mixed;
     
-    public function deactivate(string $id): PaymentLink;
+    public function deactivate(string $id, array $options = []): mixed;
 }
