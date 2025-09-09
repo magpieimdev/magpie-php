@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-09-09
+
+### Fixed
+
+- Static analysis errors and warnings (PHPStan Level 5 compliance)
+- Code style violations (PHP-CS-Fixer compliance)
+- NetworkException constructor parameter order
+- ValidationException PHPDoc type annotations
+- PHPStan configuration for hybrid API design patterns
+
+### Technical
+
+- Added intelligent PHPStan suppressions for intentional design decisions
+- Excluded specific DTO files from covariance checks to preserve runtime compatibility
+- Improved CI/CD pipeline compatibility (all GitHub Actions checks now pass)
+
 ## [1.1.0] - 2025-09-09
 
 ### Added
