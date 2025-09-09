@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Magpie\DTOs\Responses;
 
-abstract class BaseResponse
+abstract class BaseResponse implements \ArrayAccess
 {
+    private array $_data = [];
     public static function fromArray(array $data): static
     {
         $reflection = new \ReflectionClass(static::class);
@@ -23,6 +24,20 @@ abstract class BaseResponse
             $value = $data[$key] ?? null;
             
             if ($value !== null) {
+                // Handle type conversions
+                $type = $parameter->getType();
+                if ($type instanceof \ReflectionNamedType) {
+                    $typeName = $type->getName();
+                    
+                    // Handle enum conversion
+                    if (enum_exists($typeName) && is_string($value)) {
+                        $value = $typeName::from($value);
+                    }
+                    // Handle complex object construction
+                    elseif (class_exists($typeName) && is_array($value) && method_exists($typeName, 'fromArray')) {
+                        $value = $typeName::fromArray($value);
+                    }
+                }
                 $args[] = $value;
             } else if ($parameter->isDefaultValueAvailable()) {
                 $args[] = $parameter->getDefaultValue();
@@ -31,7 +46,9 @@ abstract class BaseResponse
             }
         }
         
-        return new static(...$args);
+        $instance = new static(...$args);
+        $instance->_data = $data;
+        return $instance;
     }
 
     public function toArray(): array
@@ -77,5 +94,29 @@ abstract class BaseResponse
         }
         
         return $value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->_data[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->_data[$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if ($offset === null) {
+            $this->_data[] = $value;
+        } else {
+            $this->_data[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->_data[$offset]);
     }
 }

@@ -73,13 +73,14 @@ abstract class BaseResource
      * @param array $data    Resource creation data
      * @param array $options Additional request options
      *
-     * @return array Created resource data
+     * @return mixed Created resource data
      *
      * @throws MagpieException
      */
-    protected function create(array $data, array $options = []): array
+    protected function create(array $data, array $options = []): mixed
     {
-        return $this->client->post($this->basePath, $data, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->post($this->basePath, $data, $requestOptions);
     }
 
     /**
@@ -88,13 +89,14 @@ abstract class BaseResource
      * @param string $id      Resource ID
      * @param array  $options Additional request options
      *
-     * @return array Resource data
+     * @return mixed Resource data
      *
      * @throws MagpieException
      */
-    protected function retrieve(string $id, array $options = []): array
+    protected function retrieve(string $id, array $options = []): mixed
     {
-        return $this->client->get($this->buildPath($id), null, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->get($this->buildPath($id), null, $requestOptions);
     }
 
     /**
@@ -104,13 +106,14 @@ abstract class BaseResource
      * @param array  $data    Update data
      * @param array  $options Additional request options
      *
-     * @return array Updated resource data
+     * @return mixed Updated resource data
      *
      * @throws MagpieException
      */
-    protected function update(string $id, array $data, array $options = []): array
+    protected function update(string $id, array $data, array $options = []): mixed
     {
-        return $this->client->put($this->buildPath($id), $data, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->put($this->buildPath($id), $data, $requestOptions);
     }
 
     /**
@@ -119,13 +122,14 @@ abstract class BaseResource
      * @param string $id      Resource ID
      * @param array  $options Additional request options
      *
-     * @return array Deletion result
+     * @return mixed Deletion result
      *
      * @throws MagpieException
      */
-    protected function delete(string $id, array $options = []): array
+    protected function delete(string $id, array $options = []): mixed
     {
-        return $this->client->delete($this->buildPath($id), null, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->delete($this->buildPath($id), null, $requestOptions);
     }
 
     /**
@@ -134,13 +138,14 @@ abstract class BaseResource
      * @param array $params  List parameters (filters, pagination, etc.)
      * @param array $options Additional request options
      *
-     * @return array List response with data and pagination info
+     * @return mixed List response with data and pagination info
      *
      * @throws MagpieException
      */
-    protected function list(array $params = [], array $options = []): array
+    protected function list(array $params = [], array $options = []): mixed
     {
-        return $this->client->get($this->basePath, $params, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->get($this->basePath, $params, $requestOptions);
     }
 
     /**
@@ -151,13 +156,14 @@ abstract class BaseResource
      * @param array|null $data    Request data
      * @param array      $options Additional request options
      *
-     * @return array Response data
+     * @return mixed Response data
      *
      * @throws MagpieException
      */
     protected function customAction(string $method, string $path, ?array $data = null, array $options = []): array
     {
-        return $this->client->request($method, $path, $data, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->request($method, $path, $data, $requestOptions);
     }
 
     /**
@@ -169,13 +175,14 @@ abstract class BaseResource
      * @param array|null $data    Request data
      * @param array      $options Additional request options
      *
-     * @return array Response data
+     * @return mixed Response data
      *
      * @throws MagpieException
      */
     protected function customResourceAction(string $method, string $id, string $action, ?array $data = null, array $options = []): array
     {
-        return $this->client->request($method, $this->buildPath($id, $action), $data, $options);
+        $requestOptions = $this->customBaseUrl ? array_merge($options, ['base_uri' => $this->customBaseUrl]) : $options;
+        return $this->client->request($method, $this->buildPath($id, $action), $data, $requestOptions);
     }
 
     /**
@@ -248,5 +255,15 @@ abstract class BaseResource
         }
 
         return $queryParams;
+    }
+
+    protected function createFromArray(array $data): mixed
+    {
+        return $data;
+    }
+
+    protected function createListFromArray(array $data): mixed
+    {
+        return $data;
     }
 }

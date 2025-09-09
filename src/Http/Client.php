@@ -263,6 +263,11 @@ class Client
                     'expand' => $options['expand'],
                 ]);
             }
+            
+            // Handle custom base_uri if provided
+            if (isset($options['base_uri'])) {
+                $requestOptions['base_uri'] = $options['base_uri'];
+            }
 
             $response = $this->httpClient->request($method, $path, $requestOptions);
 
