@@ -13,6 +13,8 @@ namespace Magpie\DTOs\ValueObjects;
 class LineItem
 {
     public function __construct(
+        /** The name of the line item. */
+        public readonly string $name,
         /** The amount of the line item in the smallest currency unit (e.g., cents). */
         public readonly int $amount,
         /** The quantity of the line item being purchased. */
@@ -29,6 +31,7 @@ class LineItem
     public static function fromArray(array $data): self
     {
         return new self(
+            name: $data['name'],
             amount: $data['amount'],
             quantity: $data['quantity'],
             description: $data['description'] ?? null,
@@ -42,6 +45,7 @@ class LineItem
     public function toArray(): array
     {
         return array_filter([
+            'name' => $this->name,
             'amount' => $this->amount,
             'quantity' => $this->quantity,
             'description' => $this->description,

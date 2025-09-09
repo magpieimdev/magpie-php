@@ -9,4 +9,6 @@ enum ChargeStatus: string
     case PENDING = 'pending';
     case SUCCEEDED = 'succeeded';
     case FAILED = 'failed';
+    case VOIDED = 'voided';
+    case REFUNDED = 'refunded';
 }

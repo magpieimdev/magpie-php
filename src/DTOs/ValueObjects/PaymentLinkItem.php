@@ -13,6 +13,7 @@ namespace Magpie\DTOs\ValueObjects;
 class PaymentLinkItem extends LineItem
 {
     public function __construct(
+        string $name,
         int $amount,
         int $quantity,
         ?string $description = null,
@@ -20,7 +21,7 @@ class PaymentLinkItem extends LineItem
         /** The total number of stocks remaining. */
         public readonly int $remaining = 0
     ) {
-        parent::__construct($amount, $quantity, $description, $image);
+        parent::__construct($name, $amount, $quantity, $description, $image);
     }
 
     /**
@@ -29,6 +30,7 @@ class PaymentLinkItem extends LineItem
     public static function fromArray(array $data): self
     {
         return new self(
+            name: $data['name'],
             amount: $data['amount'],
             quantity: $data['quantity'],
             description: $data['description'] ?? null,
@@ -43,6 +45,7 @@ class PaymentLinkItem extends LineItem
     public function toArray(): array
     {
         return array_filter([
+            'name' => $this->name,
             'amount' => $this->amount,
             'quantity' => $this->quantity,
             'description' => $this->description,

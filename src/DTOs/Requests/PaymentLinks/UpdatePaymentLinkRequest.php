@@ -14,6 +14,7 @@ class UpdatePaymentLinkRequest extends BaseRequest
     public function __construct(
         public readonly bool $allow_adjustable_quantity,
         public readonly string $currency,
+        public readonly string $internal_name,
         /** @var PaymentLinkItem[] */
         public readonly array $line_items,
         public readonly array $payment_method_types,
@@ -31,11 +32,12 @@ class UpdatePaymentLinkRequest extends BaseRequest
     /**
      * Create an UpdatePaymentLinkRequest from an array with automatic conversion.
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
         return new self(
             allow_adjustable_quantity: $data['allow_adjustable_quantity'],
             currency: $data['currency'],
+            internal_name: $data['internal_name'],
             line_items: array_map(
                 fn($item) => is_array($item) ? PaymentLinkItem::fromArray($item) : $item,
                 $data['line_items']
