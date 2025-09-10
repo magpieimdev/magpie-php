@@ -197,39 +197,6 @@ class ChargesResourceTest extends TestCase
         $this->assertSame('succeeded', $result['status']);
     }
 
-    public function testVerify(): void
-    {
-        $client = \Mockery::mock(Client::class);
-        $resource = new ChargesResource($client);
-
-        $chargeId = 'ch_verify_123';
-        $params = [
-            'confirmation_id' => '1234567890',
-            'otp' => '123456',
-        ];
-
-        $expectedResponse = $this->createCompleteChargeData([
-            'id' => $chargeId,
-            'amount' => 40000,
-            'status' => 'succeeded',
-            'verification' => [
-                'status' => 'verified',
-                'verified_at' => 1640995200,
-            ],
-        ]);
-
-        $client->shouldReceive('request')
-            ->once()
-            ->with('POST', "charges/{$chargeId}/verify", $params, [])
-            ->andReturn($expectedResponse);
-
-        $result = $resource->verify($chargeId, $params);
-
-        $this->assertSame($chargeId, $result['id']);
-        $this->assertSame('succeeded', $result['status']);
-        $this->assertSame('verified', $result['verification']['status']);
-    }
-
     public function testVoid(): void
     {
         $client = \Mockery::mock(Client::class);
@@ -510,34 +477,5 @@ class ChargesResourceTest extends TestCase
 
         $this->assertSame(20000, $result['amount_refunded']);
         $this->assertArrayHasKey('charges', $result['refunds'][0]);
-    }
-
-    public function testVerifyWithOptions(): void
-    {
-        $client = \Mockery::mock(Client::class);
-        $resource = new ChargesResource($client);
-
-        $chargeId = 'ch_verify_456';
-        $params = ['confirmation_id' => '987654321'];
-        $options = ['expand' => ['source']];
-
-        $expectedResponse = $this->createCompleteChargeData([
-            'id' => $chargeId,
-            'status' => 'succeeded',
-            'source' => SourcesResourceTest::createCompleteSourceData([
-                'id' => 'src_456',
-                'type' => 'bank_debit',
-            ]),
-        ]);
-
-        $client->shouldReceive('request')
-            ->once()
-            ->with('POST', "charges/{$chargeId}/verify", $params, $options)
-            ->andReturn($expectedResponse);
-
-        $result = $resource->verify($chargeId, $params, $options);
-
-        $this->assertSame('succeeded', $result['status']);
-        $this->assertArrayHasKey('source', $result);
     }
 }

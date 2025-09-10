@@ -137,33 +137,6 @@ class ChargesResource extends BaseResource implements ChargeServiceInterface
     }
 
     /**
-     * Verify a charge with additional authentication data.
-     *
-     * This method is used for direct bank payments where additional customer
-     * authentication is required.
-     *
-     * @param string $id      The unique identifier of the charge to verify
-     * @param array  $params  The verification parameters
-     * @param array  $options Additional request options
-     *
-     * @return array The verified charge data
-     *
-     * @throws MagpieException
-     *
-     * @example
-     * ```php
-     * $verified = $magpie->charges->verify('ch_1234567890', [
-     *     'confirmation_id' => '1234567890',
-     *     'otp' => '123456'
-     * ]);
-     * ```
-     */
-    public function verify(string $id, array $params, array $options = []): array
-    {
-        return $this->customResourceAction('POST', $id, 'verify', $params, $options);
-    }
-
-    /**
      * Void a charge, canceling it before it can be captured.
      *
      * This method can only be used on charges that have been authorized but not yet
