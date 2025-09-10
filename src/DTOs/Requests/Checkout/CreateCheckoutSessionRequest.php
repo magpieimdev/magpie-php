@@ -44,7 +44,7 @@ class CreateCheckoutSessionRequest extends BaseRequest
     /**
      * Create a CreateCheckoutSessionRequest from an array with automatic conversion.
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
         return new self(
             cancel_url: $data['cancel_url'],

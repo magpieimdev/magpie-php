@@ -33,7 +33,7 @@ class CreatePaymentLinkRequest extends BaseRequest
     /**
      * Create a CreatePaymentLinkRequest from an array with automatic conversion.
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
         return new self(
             allow_adjustable_quantity: $data['allow_adjustable_quantity'],
