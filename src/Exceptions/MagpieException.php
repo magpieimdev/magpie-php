@@ -111,7 +111,15 @@ class MagpieException extends \Exception
         }
 
         $error = $data['error'] ?? $data;
-        $message = $error['message'] ?? $data['message'] ?? "HTTP {$statusCode} Error";
+        $rawMessage = $error['message'] ?? $data['message'] ?? "HTTP {$statusCode} Error";
+
+        // Ensure message is always a string, not an array
+        if (is_array($rawMessage)) {
+            $message = implode(', ', array_filter($rawMessage, 'is_string')) ?: "HTTP {$statusCode} Error";
+        } else {
+            $message = (string) $rawMessage;
+        }
+
         $type = $error['type'] ?? static::mapStatusToErrorType($statusCode);
         $code = $error['code'] ?? "http_{$statusCode}";
         $details = $error['details'] ?? [];
