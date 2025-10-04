@@ -56,4 +56,29 @@ class Magpie extends Facade
     {
         return 'magpie';
     }
+
+    /**
+     * Handle dynamic static method calls.
+     *
+     * @param string $method
+     * @param array $args
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        $instance = static::getFacadeRoot();
+
+        // If method exists, call it normally
+        if (method_exists($instance, $method)) {
+            return $instance->$method(...$args);
+        }
+
+        // If property exists, return it (for resource access)
+        if (property_exists($instance, $method)) {
+            return $instance->$method;
+        }
+
+        // Fall back to parent behavior
+        return parent::__callStatic($method, $args);
+    }
 }
