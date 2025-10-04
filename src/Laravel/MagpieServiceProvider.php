@@ -38,14 +38,14 @@ class MagpieServiceProvider extends ServiceProvider implements DeferrableProvide
             }
 
             $httpConfig = new Config([
-                'baseUrl' => $config['base_url'],
-                'apiVersion' => $config['api_version'],
-                'timeout' => $config['timeout'],
-                'connectTimeout' => $config['connect_timeout'],
-                'maxRetries' => $config['max_retries'],
-                'retryDelay' => $config['retry_delay'],
-                'debug' => $config['debug'],
-                'verifySsl' => $config['verify_ssl'],
+                'baseUrl' => $config['base_url'] ?? 'https://api.magpie.im',
+                'apiVersion' => $config['api_version'] ?? 'v2',
+                'timeout' => $config['timeout'] ?? 30,
+                'connectTimeout' => $config['connect_timeout'] ?? 10,
+                'maxRetries' => $config['max_retries'] ?? 3,
+                'retryDelay' => $config['retry_delay'] ?? 1000,
+                'debug' => $config['debug'] ?? false,
+                'verifySsl' => $config['verify_ssl'] ?? true,
                 'defaultHeaders' => $config['default_headers'] ?? [],
             ]);
 
