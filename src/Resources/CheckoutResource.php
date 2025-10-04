@@ -27,4 +27,14 @@ class CheckoutResource
     {
         $this->sessions = new CheckoutSessionsResource($client);
     }
+
+    /**
+     * Get the checkout sessions resource.
+     *
+     * @return CheckoutSessionsResource
+     */
+    public function sessions(): CheckoutSessionsResource
+    {
+        return $this->sessions;
+    }
 }
